@@ -15,7 +15,8 @@ const app = express();
 
 async function connectDB() {
   try {
-    await mongoose.connect('mongodb://127.0.0.1:27017/chatapp', {
+    await mongoose.connect('mongodb+srv://Musala001:<*Patricia123#>@cluster0.otlfit6.mongodb.net/<your-db-name>?retryWrites=true&w=majority
+', {
       serverSelectionTimeoutMS: 5000 // 5 second timeout
     });
     console.log('MongoDB Connected');
