@@ -15,21 +15,23 @@ const app = express();
 
 async function connectDB() {
   try {
-    await mongoose.connect('mongodb+srv://Musala001:<*Patricia123#>@cluster0.otlfit6.mongodb.net/<your-db-name>?retryWrites=true&w=majority
-', {
-      serverSelectionTimeoutMS: 5000 // 5 second timeout
+    await mongoose.connect('mongodb+srv://Musala001:Patricia123%23@cluster0.otlfit6.mongodb.net/chatapp?retryWrites=true&w=majority', {
+      serverSelectionTimeoutMS: 5000,
+      useNewUrlParser: true,
+      useUnifiedTopology: true
     });
     console.log('MongoDB Connected');
-    
+
     // Test connection by inserting a document
     const testDoc = await mongoose.connection.db.collection('test').insertOne({ test: true });
     console.log('Test document inserted:', testDoc.insertedId);
-    
+
   } catch (err) {
     console.error('MongoDB Connection Failed:', err);
-    process.exit(1); // Exit process with failure
+    process.exit(1);
   }
 }
+
 
 connectDB();
 // 2. Add the connection event handlers RIGHT AFTER the connection
