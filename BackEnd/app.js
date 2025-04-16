@@ -71,7 +71,7 @@ app.use(session({
   secret: 'chatsecret',
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: 'mongodb://localhost:27017/chatapp' })
+  store: MongoStore.create({ mongoUrl: 'mongodb+srv://Musala001:%2APatricia123%23@cluster0.otlfit6.mongodb.net/chatapp?retryWrites=true&w=majority' })
 }));
 
 // Middleware to make user available in all views
