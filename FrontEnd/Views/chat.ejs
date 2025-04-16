@@ -1,0 +1,90 @@
+<%- include('../Partials/head', { 
+  title: currentChatFriend ? `Chat with ${friends.find(f => f._id.equals(currentChatFriend))?.username}` : 'Chat',
+  stylesheets: ['/Styles/chat.css'] 
+}) %>
+
+<%- include('../Partials/header', { title: 'Chat' }) %>
+<input type="hidden" id="currentUser" value="<%= currentUser._id %>">
+<input type="hidden" id="friendUser" value="<%= currentChatFriend %>">
+
+
+<main class="chat-container">
+  <section class="chat-layout">
+    <div class="friend-list">
+      <h3>Friends</h3>
+      <ul>
+        <% friends.forEach(friend => { %>
+          <li class="friend-item <%= currentChatFriend === friend._id.toString() ? 'active' : '' %>"
+              data-friend-id="<%= friend._id %>">
+            <div class="friend-avatar">
+              <%= friend.username.charAt(0).toUpperCase() %>
+            </div>
+            <div class="friend-info">
+              <span class="friend-name"><%= friend.username %></span>
+              <span class="friend-status <%= friend.online ? 'online' : 'offline' %>">
+                <%= friend.online ? 'Online' : 'Offline' %>
+              </span>
+            </div>
+          </li>
+        <% }) %>
+      </ul>
+    </div>
+
+    <div class="chat-window">
+      <% if (currentChatFriend) { %>
+        <div class="message-container" id="messages">
+          <% if (messages.length > 0) { %>
+            <% messages.forEach(msg => { %>
+              <% if (msg.sender && msg.sender._id) { %>
+                <div class="message <%= msg.sender._id.equals(currentUser._id) ? 'sent' : 'received' %>">
+                  <div class="message-content">
+                    <div class="message-header">
+                      <span class="sender-name">
+                        <%= msg.sender._id.equals(currentUser._id) ? 'You' : (msg.sender.username || 'Unknown') %>
+                      </span>
+                      <span class="message-time">
+                        <%= msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '' %>
+                      </span>
+                    </div>
+                    <p class="message-text"><%= msg.content %></p>
+                  </div>
+                </div>
+              <% } %>
+            <% }) %>
+          <% } else { %>
+            <div class="empty-state">
+              <p>No messages yet. Say hello!</p>
+            </div>
+          <% } %>
+        </div>
+        
+        <form id="message-form" class="message-form">
+          <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" required>
+          <button type="submit">Send</button>
+        </form>
+      <% } else { %>
+        <div class="select-friend-prompt">
+          <i class="fas fa-comment-dots"></i>
+          <h3>Select a friend to chat</h3>
+          <p>Choose from your friends list to start messaging</p>
+        </div>
+      <% } %>
+    </div>
+  </section>
+</main>
+
+<!-- Socket.IO script -->
+<script src="/socket.io/socket.io.js"></script>
+<script src="/Scripts/chat.js"></script>
+
+<%- include('../Partials/footer') %>
+
+<script>
+  // Make friend items clickable
+  document.querySelectorAll('.friend-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const friendId = item.dataset.friendId;
+      window.location.href = `/chat/${friendId}`;
+    });
+  });
+</script>

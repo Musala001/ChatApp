@@ -1,0 +1,29 @@
+<%- include('../Partials/head', { 
+  title: 'Register',
+  stylesheets: ['/Styles/register.css'] 
+}) %>
+
+<%- include('../Partials/header', { title: 'Register' }) %>
+
+<main>
+  <section>
+    <h2>Sign Up</h2>
+
+    <form action="/register" method="POST" class="auth-form">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" placeholder="Enter your username" required><br>
+      
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" placeholder="Enter your password" required><br>
+      
+      <label for="confirmPassword">Confirm Password:</label>
+      <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required><br>
+      
+      <button type="submit">Register</button>
+    </form>
+
+    <p>Already have an account? <a href="/login">Login here</a></p>
+  </section>
+</main>
+
+<%- include('../Partials/footer') %>

@@ -1,0 +1,26 @@
+<%- include('../Partials/head', { 
+  title: 'Login',
+  stylesheets: ['/Styles/login.css'] 
+}) %>
+
+<%- include('../Partials/header', { title: 'Login' }) %>
+
+<main>
+  <section>
+    <h2>Login</h2>
+
+    <form action="/login" method="POST" class="auth-form">
+      <label for="username">iUsername:</label>
+      <input type="text" id="username" name="username" placeholder="Enter your username" required><br>
+      
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" placeholder="Enter your password" required><br>
+      
+      <button type="submit">Login</button>
+    </form>
+
+    <p>Don't have an account? <a href="/">Sign up here</a></p>
+  </section>
+</main>
+
+<%- include('../Partials/footer') %>

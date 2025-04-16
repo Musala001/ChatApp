@@ -1,0 +1,77 @@
+/* ======= Header Styles ======= */
+.main-header {
+    background-color: #1e293b;
+    color: white;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  
+  .logo a {
+    display: flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  
+  .logo i {
+    margin-right: 0.5rem;
+    font-size: 1.8rem;
+    color: #38bdf8;
+  }
+  
+  .main-nav {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    margin-top: 0.5rem;
+  }
+  
+  .nav-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-link i {
+    margin-right: 0.4rem;
+  }
+  
+  .nav-link:hover {
+    color: #38bdf8;
+  }
+  
+  .nav-link.active {
+    color: #38bdf8;
+    font-weight: 600;
+  }
+/* ======= Footer Styles ======= */
+footer {
+    background-color: #1e293b;
+    color: #f1f5f9;
+    text-align: center;
+    padding: 1rem 0;
+    font-size: 0.95rem;
+    margin-top: 2rem;
+    border-top: 1px solid #334155;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  footer p {
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+    

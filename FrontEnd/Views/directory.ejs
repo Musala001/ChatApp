@@ -1,0 +1,42 @@
+<%- include('../Partials/head', { 
+  title: 'directory',
+  stylesheets: ['/Styles/directory.css'] 
+}) %>
+<%- include('../Partials/header', { title: 'User Directory' }) %>
+
+<main>
+  <section>
+    <h2>Users</h2>
+    
+    <div class="search-container">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" id="userSearch" placeholder="Search users...">
+    </div>
+    
+    <div class="filter-tabs">
+      <div class="filter-tab active">All Users</div>
+      <div class="filter-tab">Online</div>
+      <div class="filter-tab">New Users</div>
+    </div>
+
+    <ul class="user-list">
+      <% users.forEach(user => { %>
+        <li class="user-item">
+          <div class="user-info">
+            <div class="user-avatar">
+              <%= user.username.charAt(0).toUpperCase() %>
+            </div>
+            <span class="user-name"><%= user.username %></span>
+            <div class="user-status <%= user.online ? 'status-online' : 'status-offline' %>"></div>
+          </div>
+          <a href="/add-friend/<%= user._id %>" class="add-friend-btn">
+            <i class="fas fa-user-plus"></i>
+            Add Friend
+          </a>
+        </li>
+      <% }) %>
+    </ul>
+  </section>
+</main>
+
+<%- include('../Partials/footer') %>

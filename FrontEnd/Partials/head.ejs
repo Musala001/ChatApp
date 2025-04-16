@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | ChatApp</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.ico">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Use absolute paths from root -->
+<!-- For CSS files -->
+<link rel="stylesheet" href="/Styles/chat.css">
+<link rel="stylesheet" href="/Styles/head.css">
+
+
+
+  
+  <!-- Page-specific CSS -->
+  <% if (stylesheets && stylesheets.length) { %>
+    <% stylesheets.forEach(css => { %>
+      <link rel="stylesheet" href="<%= css %>">
+    <% }) %>
+  <% } %>
+</head>
+<body>

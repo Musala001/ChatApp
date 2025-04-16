@@ -1,0 +1,34 @@
+<%- include('../Partials/head', { 
+  title: 'Friends',
+  stylesheets: ['/Styles/friends.css'],
+  isChatPage: false /* Add this line */
+}) %>
+
+<%- include('../Partials/header', { title: 'Friends' }) %>
+<main>
+  <section>
+    <h2>Your Friends</h2>
+
+    <!-- Links to other pages -->
+    <nav>
+      <ul>
+        <li><a href="/directory">Go to User Directory</a></li>
+        <li><a href="/chat">View All Chats</a></li>
+      </ul>
+    </nav>
+
+    <ul class="friends-list">
+      <% friends.forEach(friend => { %>
+        <li>
+          <span class="friend-username"><%= friend.username %></span>
+          <div class="friend-actions">
+            <a href="/chat/<%= friend._id %>">Message</a>
+            <a href="/remove-friend/<%= friend._id %>">Remove</a>
+          </div>
+        </li>
+      <% }) %>
+    </ul>
+  </section>
+</main>
+
+<%- include('../Partials/footer') %>

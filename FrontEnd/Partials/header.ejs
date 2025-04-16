@@ -1,0 +1,28 @@
+<header class="main-header">
+  <div class="header-container">
+    <div class="logo">
+      <a href="/">
+        <i class="fas fa-comment-dots"></i>
+        <span>WILDChat</span>
+      </a>
+    </div>
+    
+    <nav class="main-nav">
+      <% if (currentUser) { %>
+        <a href="/friends" class="nav-link">
+          <i class="fas fa-user-friends"></i> Friends
+        </a>
+        <a href="/logout" class="nav-link">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      <% } else { %>
+        <a href="/login" class="nav-link active">
+          <i class="fas fa-sign-in-alt"></i> Login
+        </a>
+        <a href="/" class="nav-link">
+          <i class="fas fa-user-plus"></i> Register
+        </a>
+      <% } %>
+    </nav>
+  </div>
+</header>
