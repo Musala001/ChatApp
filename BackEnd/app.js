@@ -15,7 +15,7 @@ const app = express();
 
 async function connectDB() {
   try {
-    await mongoose.connect('mongodb+srv://Musala001:%2APatricia123%23@cluster0.otlfit6.mongodb.net/chatapp?retryWrites=true&w=majority', {
+    await mongoose.connect('mongodb+srv://Musala001:Patricia123%23@cluster0.otlfit6.mongodb.net/chatapp?retryWrites=true&w=majority', {
       serverSelectionTimeoutMS: 5000,
       useNewUrlParser: true,
       useUnifiedTopology: true
@@ -31,6 +31,7 @@ async function connectDB() {
     process.exit(1);
   }
 }
+
 
 
 connectDB();
