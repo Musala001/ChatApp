@@ -1,0 +1,25 @@
+<%- include('../Partials/head', { 
+    title: 'Edit Profile',
+    stylesheets: ['/Styles/edit-profile.css'] 
+  }) %>
+  
+  <%- include('../Partials/header', { title: 'Edit Profile' }) %>
+  
+  <main class="edit-profile-container">
+    <form action="/profile/update" method="POST">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" 
+               value="<%= user.username %>" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="bio">Bio</label>
+        <textarea id="bio" name="bio"><%= user.bio || '' %></textarea>
+      </div>
+      
+      <button type="submit" class="save-btn">Save Changes</button>
+    </form>
+  </main>
+  
+  <%- include('../Partials/footer') %>

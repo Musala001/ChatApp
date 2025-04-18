@@ -1,0 +1,424 @@
+<%- include('../Partials/head', { 
+  title: 'Posts',
+  stylesheets: ['/Styles/posts.css'] 
+}) %>
+<%- include('../Partials/header', { title: 'Posts' }) %>
+
+<main class="posts-container">
+  <section class="create-post">
+    <form action="/posts" method="POST" enctype="multipart/form-data" id="post-form">
+      <textarea name="content" placeholder="What's on your mind?" required></textarea>
+      <div class="post-options">
+        <label class="file-upload">
+          <input type="file" name="media" id="media-upload" accept="image/*, video/*">
+          <i class="fas fa-camera"></i> Media
+          <span id="file-name"></span>
+        </label>
+        <button type="submit" class="post-button">Post</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="posts-feed">
+    <% posts.forEach(post => { %>
+      <div class="post-card" data-post-id="<%= post._id %>">
+        <div class="post-header">
+          <div class="user-avatar"><%= post.author.username.charAt(0).toUpperCase() %></div>
+          <div class="user-info">
+            <span class="username"><%= post.author.username %></span>
+            <span class="post-time"><%= new Date(post.createdAt).toLocaleString() %></span>
+          </div>
+          <!-- TEMPORARY DEBUG - REMOVE LATER -->
+
+          <% if (currentUser && currentUser._id.toString() === post.author._id.toString()) { %>
+            <button class="delete-post-btn" data-post-id="<%= post._id %>">
+              <i class="fas fa-trash"></i>
+            </button>
+          <% } %>
+        </div>
+        
+        <div class="post-content">
+          <p><%= post.content %></p>
+          <% if (post.mediaUrl) { %>
+            <% if (post.mediaType.startsWith('image')) { %>
+              <img src="<%= post.mediaUrl %>" alt="Post image" class="post-media" 
+                   onerror="this.style.display='none'">
+            <% } else if (post.mediaType.startsWith('video')) { %>
+              <video controls class="post-media" onerror="this.style.display='none'">
+                <source src="<%= post.mediaUrl %>" type="<%= post.mediaType %>">
+                Your browser does not support the video tag.
+              </video>
+            <% } %>
+          <% } %>
+        </div>
+        
+        <div class="post-actions">
+          <button class="like-btn" data-post-id="<%= post._id %>">
+            <i class="far fa-heart"></i> <%= post.likes.length %>
+          </button>
+          <button class="comment-btn">
+            <i class="far fa-comment"></i> Comment (<%= post.comments.length %>)
+          </button>
+        </div>
+        
+        <div class="comments-section" id="comments-<%= post._id %>" style="display: none;">
+          <div class="comments-list">
+            <% if (post.comments && post.comments.length > 0) { %>
+              <% post.comments.forEach(comment => { %>
+                <div class="comment" data-comment-id="<%= comment._id %>">
+                  <div class="comment-author"><%= comment.author.username %>:</div>
+                  <div class="comment-text"><%= comment.text %></div>
+                  <button class="delete-comment-btn" data-comment-id="<%= comment._id %>" data-post-id="<%= post._id %>">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              <% }); %>
+            <% } else { %>
+              <div class="no-comments">No comments yet</div>
+            <% } %>
+          </div>
+          <form class="add-comment-form" data-post-id="<%= post._id %>">
+            <input type="text" name="comment" placeholder="Write a comment..." required>
+            <button type="submit">Post</button>
+          </form>
+        </div>
+      </div>
+    <% }); %>
+  </section>
+
+  <div id="toast" class="toast hidden"></div>
+</main>
+
+<%- include('../Partials/footer') %>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Show selected file name
+    document.getElementById('media-upload').addEventListener('change', function(e) {
+  const fileInput = e.target;
+  const fileNameDisplay = document.getElementById('file-name');
+  
+  if (fileInput.files.length > 0) {
+    const file = fileInput.files[0];
+    
+    // Allow all image/video types (server will validate)
+    const isMedia = file.type.startsWith('image/') || file.type.startsWith('video/');
+    
+    if (!isMedia) {
+      fileNameDisplay.textContent = 'Invalid file';
+      fileInput.value = '';
+      showToast('Please select an image or video file');
+      return;
+    }
+    
+    // Check file size (client-side, 25MB max)
+    if (file.size > 25 * 1024 * 1024) {
+      fileNameDisplay.textContent = 'File too large';
+      fileInput.value = '';
+      showToast('Maximum file size is 25MB');
+      return;
+    }
+    
+    fileNameDisplay.textContent = file.name.length > 25 
+      ? file.name.substring(0, 22) + '...' 
+      : file.name;
+  } else {
+    fileNameDisplay.textContent = 'No file chosen';
+  }
+});
+
+document.querySelectorAll('.like-btn').forEach(btn => {
+  btn.addEventListener('click', async function() {
+    const postId = this.dataset.postId;
+    const icon = this.querySelector('i') || this;
+    const originalHTML = this.innerHTML;
+    
+    try {
+      // Show loading state
+      this.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+      this.disabled = true;
+      
+      const response = await fetch(`/posts/${postId}/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include' // For session cookies
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to like post');
+      }
+      
+      const result = await response.json();
+      this.innerHTML = `<i class="fas fa-heart"></i> ${result.likes}`;
+      
+    } catch (error) {
+      console.error('Like error:', error);
+      this.innerHTML = originalHTML;
+      showToast(error.message);
+    } finally {
+      this.disabled = false;
+    }
+  });
+});
+
+document.querySelector('#post-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const form = e.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const originalText = submitBtn.textContent;
+  
+  try {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Posting...`;
+    
+    const formData = new FormData(form);
+    const response = await fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      credentials: 'include'
+    });
+    
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || 'Post failed');
+    }
+    
+    window.location.reload();
+    
+  } catch (error) {
+    console.error('Post error:', error);
+    alert(error.message);
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+  }
+});
+
+    // Comment button toggle functionality
+    document.querySelectorAll('.comment-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const postId = this.closest('.post-card').dataset.postId;
+        const commentsSection = document.getElementById(`comments-${postId}`);
+        commentsSection.style.display = commentsSection.style.display === 'none' ? 'block' : 'none';
+      });
+    });
+
+    // Add comment functionality
+  // In your add-comment-form submit handler, replace with:
+// Replace your existing comment submission handler with this:
+document.querySelectorAll('.add-comment-form').forEach(form => {
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const postCard = this.closest('.post-card');
+    if (!postCard) {
+      console.error('Could not find parent post card');
+      return;
+    }
+
+    const postId = this.dataset.postId;
+    const commentInput = this.querySelector('input[name="comment"]');
+    const commentText = commentInput?.value?.trim();
+    
+    if (!commentText) {
+      showToast('Please enter a comment'); // Replaced alert with toast
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/posts/${postId}/comment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text: commentText })
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to post comment');
+      }
+      
+      // Clear the input
+      if (commentInput) commentInput.value = '';
+      
+      // Find the comments list container
+      const commentsContainer = postCard.querySelector('.comments-section');
+      const commentsList = commentsContainer?.querySelector('.comments-list');
+      
+      if (!commentsList) {
+        console.error('Could not find comments list');
+        return;
+      }
+      
+      // Create new comment element
+    
+// Inside your add-comment-form event listener
+const commentElement = document.createElement('div');
+commentElement.className = 'comment';
+commentElement.dataset.commentId = result.comment._id;
+
+// Safely display the username with fallback
+const username = result.comment.author?.username || 'Unknown';
+commentElement.innerHTML = `
+  <div class="comment-author">${username}:</div>
+  <div class="comment-text">${result.comment.text}</div>
+  ${result.currentUserCanDelete ? `
+    <button class="delete-comment-btn" 
+            data-comment-id="${result.comment._id}" 
+            data-post-id="${postId}">
+      <i class="fas fa-trash"></i>
+    </button>
+  ` : ''}
+`;
+      
+      // Remove "no comments" message if present
+      const noCommentsMsg = commentsList.querySelector('.no-comments');
+      if (noCommentsMsg) noCommentsMsg.remove();
+      
+      // Add new comment
+      commentsList.appendChild(commentElement);
+      
+      // Update comment count
+      const commentBtn = postCard.querySelector('.comment-btn');
+      if (commentBtn) {
+        const match = commentBtn.textContent.match(/\((\d+)\)/);
+        const currentCount = match ? parseInt(match[1]) : 0;
+        commentBtn.innerHTML = `<i class="far fa-comment"></i> Comment (${currentCount + 1})`;
+      }
+      
+      // Show success message
+      showToast('Comment posted successfully!', false);
+      
+    } catch (error) {
+      console.error('Error posting comment:', error);
+      showToast(error.message);
+    }
+  });
+});
+
+    // Delete post functionality
+    document.querySelectorAll('.delete-post-btn').forEach(btn => {
+  btn.addEventListener('click', async function() {
+    if (!confirm('Are you sure you want to delete this post?')) return;
+    
+    const postId = this.dataset.postId;
+    try {
+      const response = await fetch(`/posts/${postId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token') // If using JWT
+        }
+      });
+      
+      if (response.ok) {
+        this.closest('.post-card').remove();
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Failed to delete post');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to delete post');
+    }
+  });
+});
+
+    // Delete comment functionality
+    document.querySelectorAll('.delete-post-btn').forEach(btn => {
+  btn.addEventListener('click', async function() {
+    if (!confirm('Are you sure you want to delete this post?')) return;
+    
+    const postId = this.dataset.postId;
+    try {
+      const response = await fetch(`/posts/${postId}`, {
+        method: 'DELETE'
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to delete post');
+      }
+      
+      // Remove post from DOM
+      this.closest('.post-card').remove();
+      
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      function showToast(message, isError = true) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.style.background = isError ? '#ff4444' : '#4CAF50'; // Green for success
+  toast.classList.add('visible');
+
+  setTimeout(() => {
+    toast.classList.remove('visible');
+  }, 3000); // Auto-hide after 3 seconds
+}
+    }
+  });
+});
+
+// Add this to your existing script
+document.addEventListener('click', async function(e) {
+  if (e.target.closest('.delete-comment-btn')) {
+    const btn = e.target.closest('.delete-comment-btn');
+    if (!confirm('Are you sure you want to delete this comment?')) return;
+    
+    const commentId = btn.dataset.commentId;
+    const postId = btn.dataset.postId;
+    const commentElement = btn.closest('.comment');
+
+    try {
+      const response = await fetch(`/posts/${postId}/comment/${commentId}`, {
+        method: 'DELETE'
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to delete comment');
+      }
+
+      // Remove comment from UI
+      commentElement.remove();
+      
+      // Update comment count
+      const postCard = btn.closest('.post-card');
+      const commentBtn = postCard.querySelector('.comment-btn');
+      const commentsList = postCard.querySelector('.comments-list');
+      
+      if (commentBtn) {
+        const match = commentBtn.textContent.match(/\((\d+)\)/);
+        const currentCount = match ? parseInt(match[1]) : 0;
+        commentBtn.innerHTML = `<i class="far fa-comment"></i> Comment (${Math.max(0, currentCount - 1)})`;
+      }
+      
+      // Show "no comments" message if needed
+      if (commentsList && commentsList.children.length === 0) {
+        commentsList.innerHTML = '<div class="no-comments">No comments yet</div>';
+      }
+      
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+      function showToast(message, isError = true) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.style.background = isError ? '#ff4444' : '#4CAF50'; // Green for success
+  toast.classList.add('visible');
+
+  setTimeout(() => {
+    toast.classList.remove('visible');
+  }, 3000); // Auto-hide after 3 seconds
+}
+    }
+  }
+});
+
+  });
+</script>

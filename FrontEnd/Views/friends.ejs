@@ -8,19 +8,28 @@
 <main>
   <section>
     <h2>Your Friends</h2>
+    
 
     <!-- Links to other pages -->
-    <nav>
-      <ul>
-        <li><a href="/directory">Go to User Directory</a></li>
-        <li><a href="/chat">View All Chats</a></li>
+    <nav class="main-nav">
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a href="/directory" class="nav-button">User Directory</a>
+        </li>
+        <li class="nav-item">
+          <a href="/chat" class="nav-button">All Chats</a>
+        </li>
+        <li class="nav-item">
+          <a href="/posts" class="nav-button">Posts</a>
+        </li>
       </ul>
     </nav>
-
     <ul class="friends-list">
       <% friends.forEach(friend => { %>
         <li>
-          <span class="friend-username"><%= friend.username %></span>
+          <a href="/profile/<%= friend._id %>" class="friend-username">
+            <%= friend.username %>
+          </a>
           <div class="friend-actions">
             <a href="/chat/<%= friend._id %>">Message</a>
             <a href="/remove-friend/<%= friend._id %>">Remove</a>

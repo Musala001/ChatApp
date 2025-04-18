@@ -14,14 +14,14 @@
     </div>
     
     <div class="filter-tabs">
-      <div class="filter-tab active">All Users</div>
-      <div class="filter-tab">Online</div>
-      <div class="filter-tab">New Users</div>
+      <div class="filter-tab active" data-filter="all">All Users</div>
+      <div class="filter-tab" data-filter="online">Online</div>
+      <div class="filter-tab" data-filter="new">New Users</div>
     </div>
 
     <ul class="user-list">
       <% users.forEach(user => { %>
-        <li class="user-item">
+        <li class="user-item" data-username="<%= user.username.toLowerCase() %>" data-online="<%= user.online %>" data-created="<%= new Date(user.createdAt).getTime() %>">
           <div class="user-info">
             <div class="user-avatar">
               <%= user.username.charAt(0).toUpperCase() %>
@@ -40,3 +40,57 @@
 </main>
 
 <%- include('../Partials/footer') %>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('userSearch');
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    const userItems = document.querySelectorAll('.user-item');
+    
+    // Search functionality
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      filterUsers();
+    });
+    
+    // Filter tab functionality
+    filterTabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        filterTabs.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        filterUsers();
+      });
+    });
+    
+    function filterUsers() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const activeFilter = document.querySelector('.filter-tab.active').dataset.filter;
+      const now = new Date();
+      const oneWeekAgo = now.getTime() - (7 * 24 * 60 * 60 * 1000);
+      
+      userItems.forEach(item => {
+        const username = item.dataset.username;
+        const isOnline = item.dataset.online === 'true';
+        const createdAt = parseInt(item.dataset.created);
+        
+        // Apply search filter
+        const matchesSearch = username.includes(searchTerm);
+        
+        // Apply tab filter
+        let matchesFilter = true;
+        if (activeFilter === 'online') {
+          matchesFilter = isOnline;
+        } else if (activeFilter === 'new') {
+          matchesFilter = createdAt >= oneWeekAgo;
+        }
+        
+        // Show/hide based on filters
+        if (matchesSearch && matchesFilter) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+  });
+</script>

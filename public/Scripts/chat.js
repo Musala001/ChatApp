@@ -42,23 +42,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  socket.on('new-message', (msg) => {
-    const isSentByCurrentUser = String(msg.sender._id) === String(currentUser);
-
-    const messageEl = document.createElement('div');
-    messageEl.classList.add('message', isSentByCurrentUser ? 'sent' : 'received');
-
-    messageEl.innerHTML = `
-      <div class="message-content">
-        <div class="message-header">
-          <span class="sender-name">${isSentByCurrentUser ? 'You' : (msg.sender.username || 'Friend')}</span>
-          <span class="message-time">${new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-        </div>
-        <p class="message-text">${msg.content}</p>
+  // In your existing chat.js
+socket.on('new-message', (message) => {
+  const messagesContainer = document.getElementById('messages');
+  const isCurrentUser = message.sender === document.getElementById('currentUser').value;
+  
+  const messageElement = document.createElement('div');
+  messageElement.className = `message ${isCurrentUser ? 'sent' : 'received'}`;
+  
+  let contentHTML = '';
+  if (message.voiceUrl) {
+    contentHTML = `
+      <div class="voice-message">
+        <audio controls>
+          <source src="${message.voiceUrl}" type="audio/mp3">
+          Your browser does not support audio elements.
+        </audio>
       </div>
     `;
-
-    messageContainer.appendChild(messageEl);
-    messageContainer.scrollTop = messageContainer.scrollHeight;
-  });
+  } else {
+    contentHTML = `<p class="message-text">${message.content}</p>`;
+  }
+  
+  messageElement.innerHTML = `
+    <div class="message-content">
+      <div class="message-header">
+        <span class="sender-name">
+          ${isCurrentUser ? 'You' : message.sender?.username || 'Unknown'}
+        </span>
+        <span class="message-time">
+          ${new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </span>
+      </div>
+      ${contentHTML}
+    </div>
+  `;
+  
+  messagesContainer.appendChild(messageElement);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+});
 });

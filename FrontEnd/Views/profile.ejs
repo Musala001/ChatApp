@@ -1,0 +1,66 @@
+<%- include('../Partials/head', { 
+  title: profileUser.username + "'s Profile",
+  stylesheets: ['/Styles/profile.css'] 
+}) %>
+
+<%- include('../Partials/header', { 
+  title: profileUser.username + "'s Profile" 
+}) %>
+
+<main class="profile-container">
+  <section class="profile-header">
+    <div class="profile-avatar">
+      <%= profileUser.username.charAt(0).toUpperCase() %>
+    </div>
+    <div class="profile-info">
+      <h1><%= profileUser.username %></h1>
+      <% if (profileUser.bio) { %>
+        <p class="profile-bio"><%= profileUser.bio %></p>
+      <% } %>
+      
+      <% if (currentUser && profileUser && currentUser._id.toString() === profileUser._id.toString()) { %>
+        <a href="/profile/edit" class="edit-profile-btn">Edit Profile</a>
+      <% } %>
+    </div>
+  </section>
+
+  <section class="profile-friends">
+    <h2>Friends (<%= profileUser.friends.length %>)</h2>
+    <div class="friends-grid">
+      <% profileUser.friends.forEach(friend => { %>
+        <a href="/profile/<%= friend._id %>" class="friend-card">
+          <div class="friend-avatar">
+            <%= friend.username.charAt(0).toUpperCase() %>
+          </div>
+          <span><%= friend.username %></span>
+        </a>
+      <% }); %>
+    </div>
+  </section>
+
+  <section class="profile-posts">
+    <h2>Posts</h2>
+    <% if (posts.length > 0) { %>
+      <div class="posts-grid">
+        <% posts.forEach(post => { %>
+          <div class="profile-post">
+            <% if (post.mediaUrl) { %>
+              <% if (post.mediaType.startsWith('image')) { %>
+                <img src="<%= post.mediaUrl %>" alt="Post image">
+              <% } else { %>
+                <video controls>
+                  <source src="<%= post.mediaUrl %>" type="<%= post.mediaType %>">
+                </video>
+              <% } %>
+            <% } %>
+            <p><%= post.content %></p>
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <p class="no-posts">No posts yet</p>
+    <% } %>
+  </section>
+</main>
+
+<%- include('../Partials/footer') %>

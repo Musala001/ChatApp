@@ -70,6 +70,10 @@ main {
     background-color: #f1f5f9;
     transform: translateX(2px);
   }
+
+  .user-item.hidden {
+    display: none;
+  }
   
   .user-info {
     display: flex;
@@ -151,7 +155,7 @@ main {
   }
   
   .filter-tab.active {
-    background-color: #4299e1;
+    background-color: #4CAF50;
     color: white;
   }
   

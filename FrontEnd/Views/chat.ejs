@@ -1,90 +1,204 @@
 <%- include('../Partials/head', { 
   title: currentChatFriend ? `Chat with ${friends.find(f => f._id.equals(currentChatFriend))?.username}` : 'Chat',
-  stylesheets: ['/Styles/chat.css'] 
+  stylesheets: [
+    '/Styles/chat.css',
+    'https://cdnjs.cloudflare.com/ajax/libs/emoji-picker/1.1.5/css/emoji.min.css',
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+  ],
+  scripts: [
+    'https://cdnjs.cloudflare.com/ajax/libs/emoji-picker/1.1.5/js/emoji-picker.min.js',
+    '/socket.io/socket.io.js',
+    '/Scripts/chat.js',
+    '/Scripts/voice-recorder.js'
+  ]
 }) %>
 
-<%- include('../Partials/header', { title: 'Chat' }) %>
+<%- include('../Partials/header') %>
+
 <input type="hidden" id="currentUser" value="<%= currentUser._id %>">
 <input type="hidden" id="friendUser" value="<%= currentChatFriend %>">
+<input type="hidden" id="currentUsername" value="<%= currentUser.username %>">
 
-
-<main class="chat-container">
-  <section class="chat-layout">
-    <div class="friend-list">
-      <h3>Friends</h3>
-      <ul>
-        <% friends.forEach(friend => { %>
-          <li class="friend-item <%= currentChatFriend === friend._id.toString() ? 'active' : '' %>"
-              data-friend-id="<%= friend._id %>">
-            <div class="friend-avatar">
-              <%= friend.username.charAt(0).toUpperCase() %>
-            </div>
-            <div class="friend-info">
-              <span class="friend-name"><%= friend.username %></span>
-              <span class="friend-status <%= friend.online ? 'online' : 'offline' %>">
-                <%= friend.online ? 'Online' : 'Offline' %>
-              </span>
-            </div>
-          </li>
-        <% }) %>
-      </ul>
+<main class="chat-app">
+  <aside class="friends-sidebar">
+    <div class="sidebar-header">
+      <h2>Chats</h2>
+      <button class="new-chat-btn" aria-label="Start new chat">
+        <i class="fas fa-plus"></i>
+      </button>
     </div>
+    
+    <div class="friends-list">
+      <% friends.forEach(friend => { %>
+        <div class="friend-card <%= currentChatFriend === friend._id.toString() ? 'active' : '' %>" 
+             data-friend-id="<%= friend._id %>">
+          <div class="friend-avatar <%= friend.online ? 'online' : '' %>">
+            <%= friend.username.charAt(0).toUpperCase() %>
+          </div>
+          <div class="friend-info">
+            <h3><%= friend.username %></h3>
+            <p class="last-message"><%= friend.lastMessage ? friend.lastMessage.content.substring(0, 20) + (friend.lastMessage.content.length > 20 ? '...' : '') : 'No messages yet' %></p>
+          </div>
+          <div class="message-status">
+            <% if (friend.unreadCount > 0) { %>
+              <span class="unread-badge"><%= friend.unreadCount %></span>
+            <% } %>
+            <span class="time"><%= friend.lastMessage ? new Date(friend.lastMessage.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '' %></span>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </aside>
 
-    <div class="chat-window">
-      <% if (currentChatFriend) { %>
-        <div class="message-container" id="messages">
-          <% if (messages.length > 0) { %>
-            <% messages.forEach(msg => { %>
-              <% if (msg.sender && msg.sender._id) { %>
-                <div class="message <%= msg.sender._id.equals(currentUser._id) ? 'sent' : 'received' %>">
-                  <div class="message-content">
-                    <div class="message-header">
-                      <span class="sender-name">
-                        <%= msg.sender._id.equals(currentUser._id) ? 'You' : (msg.sender.username || 'Unknown') %>
-                      </span>
-                      <span class="message-time">
-                        <%= msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '' %>
-                      </span>
-                    </div>
-                    <p class="message-text"><%= msg.content %></p>
-                  </div>
-                </div>
-              <% } %>
-            <% }) %>
-          <% } else { %>
-            <div class="empty-state">
-              <p>No messages yet. Say hello!</p>
-            </div>
-          <% } %>
+  <section class="chat-main <%= !currentChatFriend ? 'empty-state' : '' %>">
+    <% if (currentChatFriend) { %>
+      <div class="chat-header">
+        <% const currentFriend = friends.find(f => f._id.equals(currentChatFriend)) %>
+        <div class="chat-partner">
+          <div class="partner-avatar <%= currentFriend.online ? 'online' : '' %>">
+            <%= currentFriend.username.charAt(0).toUpperCase() %>
+          </div>
+          <div>
+            <h2><%= currentFriend.username %></h2>
+            <p><%= currentFriend.online ? 'Online' : 'Last seen ' + new Date(currentFriend.lastSeen).toLocaleTimeString() %></p>
+          </div>
+        </div>
+        <div class="chat-actions">
+          <button class="call-btn" aria-label="Voice call">
+            <i class="fas fa-phone"></i>
+          </button>
+          <button class="video-call-btn" aria-label="Video call">
+            <i class="fas fa-video"></i>
+          </button>
+          <button class="more-btn" aria-label="More options">
+            <i class="fas fa-ellipsis-v"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="message-container" id="messages">
+        <div class="date-divider">
+          <span>Today</span>
         </div>
         
+        <% messages.forEach(msg => { %>
+          <% if (msg.sender && msg.sender._id) { %>
+            <div class="message <%= msg.sender._id.equals(currentUser._id) ? 'sent' : 'received' %>"
+                 data-message-id="<%= msg._id %>">
+              <% if (!msg.sender._id.equals(currentUser._id)) { %>
+                <div class="message-avatar">
+                  <%= msg.sender.username.charAt(0).toUpperCase() %>
+                </div>
+              <% } %>
+              
+              <div class="message-content">
+                <% if (!msg.sender._id.equals(currentUser._id)) { %>
+                  <div class="message-sender"><%= msg.sender.username %></div>
+                <% } %>
+                
+                <% if (msg.voiceUrl) { %>
+                  <div class="voice-message">
+                    <audio controls controlsList="nodownload">
+                      <source src="<%= msg.voiceUrl %>" type="audio/mpeg">
+                    </audio>
+                    <div class="waveform" data-audio-src="<%= msg.voiceUrl %>"></div>
+                    <span class="duration">0:00</span>
+                  </div>
+                <% } else { %>
+                  <div class="text-message"><%= msg.content %></div>
+                <% } %>
+                
+                <div class="message-meta">
+                  <span class="time"><%= new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %></span>
+                  <% if (msg.sender._id.equals(currentUser._id)) { %>
+                    <span class="status">
+                      <% if (msg.read) { %>
+                        <i class="fas fa-check-double read"></i>
+                      <% } else if (msg.delivered) { %>
+                        <i class="fas fa-check-double"></i>
+                      <% } else { %>
+                        <i class="fas fa-check"></i>
+                      <% } %>
+                    </span>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          <% } %>
+        <% }) %>
+      </div>
+
+      <div class="message-composer">
         <form id="message-form" class="message-form">
-          <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" required>
-          <button type="submit">Send</button>
+          <div class="input-tools">
+            <button type="button" class="emoji-btn" aria-label="Open emoji picker">
+              <i class="far fa-smile"></i>
+            </button>
+            <button type="button" class="attachment-btn" aria-label="Attach file">
+              <i class="fas fa-paperclip"></i>
+            </button>
+          </div>
+          
+          <div class="message-input-container">
+            <div id="message-input" 
+                 contenteditable="true" 
+                 placeholder="Type a message..." 
+                 role="textbox" 
+                 aria-multiline="true"></div>
+            
+            <div class="recording-ui" style="display: none;">
+              <div class="recording-indicator">
+                <div class="pulse"></div>
+                <span>Recording...</span>
+              </div>
+              <button type="button" class="cancel-recording-btn">Cancel</button>
+            </div>
+          </div>
+          
+          <div class="send-tools">
+            <button type="button" class="voice-btn" aria-label="Record voice message">
+              <i class="fas fa-microphone"></i>
+            </button>
+            <button type="submit" class="send-btn" disabled>
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
         </form>
-      <% } else { %>
-        <div class="select-friend-prompt">
-          <i class="fas fa-comment-dots"></i>
-          <h3>Select a friend to chat</h3>
-          <p>Choose from your friends list to start messaging</p>
+      </div>
+    <% } else { %>
+      <div class="empty-chat">
+        <div class="empty-illustration">
+          <i class="fas fa-comments"></i>
         </div>
-      <% } %>
-    </div>
+        <h2>Select a chat to start messaging</h2>
+        <p>Choose from your contacts or start a new conversation</p>
+        <button class="new-chat-btn">New Chat</button>
+      </div>
+    <% } %>
   </section>
 </main>
-
-<!-- Socket.IO script -->
-<script src="/socket.io/socket.io.js"></script>
-<script src="/Scripts/chat.js"></script>
 
 <%- include('../Partials/footer') %>
 
 <script>
-  // Make friend items clickable
-  document.querySelectorAll('.friend-item').forEach(item => {
-    item.addEventListener('click', () => {
-      const friendId = item.dataset.friendId;
+  // Initialize friend card click handlers
+  document.querySelectorAll('.friend-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const friendId = card.dataset.friendId;
       window.location.href = `/chat/${friendId}`;
+    });
+  });
+
+  // Initialize emoji picker
+  document.addEventListener('DOMContentLoaded', () => {
+    const picker = new EmojiPicker({
+      emojiable_selector: '#message-input',
+      assetsPath: 'https://cdnjs.cloudflare.com/ajax/libs/emoji-picker/1.1.5/img/',
+      popupButtonClasses: 'fas fa-smile'
+    });
+    
+    document.querySelector('.emoji-btn').addEventListener('click', (e) => {
+      picker.togglePicker(e.currentTarget);
     });
   });
 </script>

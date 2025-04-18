@@ -8,18 +8,26 @@
     </div>
     
     <nav class="main-nav">
-      <% if (currentUser) { %>
+      <% if (currentUser && !hideProfileLinks) { %>
+        <!-- Show these when logged in AND not on auth pages -->
+        <a href="/profile/<%= currentUser._id %>" class="nav-link">
+          <i class="fas fa-user"></i> My Profile
+        </a>
+        <a href="/profile/edit" class="nav-link">
+          <i class="fas fa-edit"></i> Edit Profile
+        </a>
         <a href="/friends" class="nav-link">
           <i class="fas fa-user-friends"></i> Friends
         </a>
         <a href="/logout" class="nav-link">
           <i class="fas fa-sign-out-alt"></i> Logout
         </a>
-      <% } else { %>
-        <a href="/login" class="nav-link active">
+      <% } else if (!hideProfileLinks) { %>
+        <!-- Show these when not logged in AND not on auth pages -->
+        <a href="/login" class="nav-link <%= isLoginPage ? 'active' : '' %>">
           <i class="fas fa-sign-in-alt"></i> Login
         </a>
-        <a href="/" class="nav-link">
+        <a href="/register" class="nav-link <%= isRegisterPage ? 'active' : '' %>">
           <i class="fas fa-user-plus"></i> Register
         </a>
       <% } %>
