@@ -18,36 +18,27 @@ const app = express();
 //MongoDB connection:
 
 
-// Replace your current connection code with this:
 // Replace your current connection with this:
-const connectDB = async () => {
+async function connectDB() {
   try {
     await mongoose.connect('mongodb+srv://Musala001:%2APatricia123%23@cluster0.otlfit6.mongodb.net/chatapp?retryWrites=true&w=majority', {
       serverSelectionTimeoutMS: 5000  // 5 seconds timeout
     });
-
-  
     console.log('MongoDB Connected');
-    
-    if (mongoose.modelNames().includes('User')) {
-      console.log('User model is available');
-    }
+
+    // Test connection by inserting a document
+    const testDoc = await mongoose.connection.db.collection('test').insertOne({ test: true });
+    console.log('Test document inserted:', testDoc.insertedId);
+
   } catch (err) {
-    console.error('MongoDB Connection Error:', err);
+    console.error('MongoDB Connection Failed:', err);
     process.exit(1);
   }
-};
-
-// Connect before defining routes
-connectDB().then(() => {
-  // Only start listening after DB connection is established
-  server.listen(3000, () => {
-    console.log('Server running on port 3000');
-  });
-});
+}
 
 
-// the connection event handlers RIGHT AFTER the connection
+connectDB();
+// 2. Add the connection event handlers RIGHT AFTER the connection
 mongoose.connection.on('connected', () => {
   console.log('Mongoose connected to DB');
   
@@ -283,7 +274,7 @@ app.use(session({
   secret: 'chatsecret',
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: 'mongodb://localhost:27017/chatapp' })
+  store: MongoStore.create({ mongoUrl: 'mongodb+srv://Musala001:%2APatricia123%23@cluster0.otlfit6.mongodb.net/chatapp?retryWrites=true&w=majority' })
 }));
 
 // Add this middleware before your routes
