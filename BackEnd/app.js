@@ -328,7 +328,7 @@ app.get('/login', (req, res) => {
 
 app.get('/register', (req, res) => {
   if (req.session.user) return res.redirect('/friends');
-  res.render('register', { 
+  res.render('Register', { 
     title: 'Register',
     stylesheets: ['/Styles/register.css'] 
   });
