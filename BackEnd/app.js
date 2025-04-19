@@ -74,10 +74,14 @@ app.set('views', path.join(__dirname, '../FrontEnd/Views'));
 // Configure multer for file uploads
 // Multer configuration for file uploads
 // Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, '../public/uploads/');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
+(async () => {
+  const uploadsDir = path.join(__dirname, '../public/uploads/');
+  try {
+    await fsp.mkdir(uploadsDir, { recursive: true });
+  } catch (err) {
+    console.error('Failed to create uploads directory:', err);
+  }
+})();
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, '../public/uploads/'));
