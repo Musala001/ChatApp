@@ -18,8 +18,6 @@ const Message = require('./Models/Message');
 const app = express();
 
 //MongoDB connection:
-
-
 async function connectDB() {
   try {
     await mongoose.connect('mongodb+srv://Musala001:%2APatricia123%23@cluster0.otlfit6.mongodb.net/chatapp?retryWrites=true&w=majority', {
@@ -42,7 +40,6 @@ async function connectDB() {
 }
 
 connectDB();
-
 
 // 2. Add the connection event handlers RIGHT AFTER the connection
 mongoose.connection.on('connected', () => {
@@ -67,6 +64,8 @@ app.use(express.json()); // Add this line
 app.use(express.static(path.join(__dirname, '../FrontEnd')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, '../public')));
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../FrontEnd/Views'));
@@ -74,6 +73,11 @@ app.set('views', path.join(__dirname, '../FrontEnd/Views'));
 // Multer configuration for file uploads
 // Configure multer for file uploads
 // Multer configuration for file uploads
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, '../public/uploads/');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, '../public/uploads/'));
