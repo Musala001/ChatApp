@@ -22,12 +22,15 @@ const app = express();
 
 async function connectDB() {
   try {
-    await mongoose.connect('mongodb://127.0.0.1:27017/chatapp', {
-      serverSelectionTimeoutMS: 5000, // 5 seconds timeout
+    await mongoose.connect('mongodb+srv://Musala001:%2APatricia123%23@cluster0.otlfit6.mongodb.net/chatapp?retryWrites=true&w=majority', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000
     });
-    console.log('✅ MongoDB Connected to localhost');
 
-    // Test insert
+    console.log('✅ MongoDB Connected to Atlas');
+
+    // Optional: Insert test document
     const testDoc = await mongoose.connection.db
       .collection('test')
       .insertOne({ test: true });
@@ -39,7 +42,6 @@ async function connectDB() {
 }
 
 connectDB();
-
 
 
 // 2. Add the connection event handlers RIGHT AFTER the connection
