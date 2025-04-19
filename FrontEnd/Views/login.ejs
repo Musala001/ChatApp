@@ -5,21 +5,26 @@
 
 <%- include('../Partials/header', { title: 'Login' }) %>
 
-<main>
-  <section>
-    <h2>Login</h2>
+<main class="login-main">
+  <section class="login-card">
+    <h2 class="login-title">Welcome Back</h2>
+    <p class="login-subtitle">Log in to continue to <strong>WILDChat</strong></p>
 
     <form action="/login" method="POST" class="auth-form">
-      <label for="username">iUsername:</label>
-      <input type="text" id="username" name="username" placeholder="Enter your username" required><br>
-      
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" placeholder="Enter your password" required><br>
-      
-      <button type="submit">Login</button>
+      <div class="form-group">
+        <label for="username"><i class="fas fa-user"></i> Username</label>
+        <input type="text" id="username" name="username" placeholder="Enter your username" required>
+      </div><br>
+
+      <div class="form-group">
+        <label for="password"><i class="fas fa-lock"></i> Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+      </div><br>
+
+      <button type="submit" class="login-btn">Login</button>
     </form>
 
-    <p>Don't have an account? <a href="/">Sign up here</a></p>
+    <p class="signup-link">Don't have an account? <a href="/register">Sign up here</a></p>
   </section>
 </main>
 

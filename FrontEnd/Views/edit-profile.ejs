@@ -5,21 +5,26 @@
   
   <%- include('../Partials/header', { title: 'Edit Profile' }) %>
   
-  <main class="edit-profile-container">
-    <form action="/profile/update" method="POST">
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" 
-               value="<%= user.username %>" required>
-      </div>
+  <body>
+
+  
+    <div class="edit-profile-container">
+      <h1>Edit Profile</h1>
+      <form action="/profile/edit/<%= currentUser._id %>" method="POST" enctype="multipart/form-data">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="<%= currentUser.name %>" required>
       
-      <div class="form-group">
-        <label for="bio">Bio</label>
-        <textarea id="bio" name="bio"><%= user.bio || '' %></textarea>
-      </div>
+        <label for="bio">Bio:</label>
+        <textarea id="bio" name="bio"><%= currentUser.bio %></textarea>
       
-      <button type="submit" class="save-btn">Save Changes</button>
-    </form>
-  </main>
+        <label for="profilePic">Profile Picture:</label>
+        <input type="file" id="profilePic" name="profilePic" accept="image/*">
+      
+        <button type="submit">Save Changes</button>
+      </form>
+      
+      
+    </div>
+  </body>
   
   <%- include('../Partials/footer') %>

@@ -10,8 +10,15 @@
 <main class="profile-container">
   <section class="profile-header">
     <div class="profile-avatar">
-      <%= profileUser.username.charAt(0).toUpperCase() %>
+      <% if (profileUser.profilePic) { %>
+        <img src="<%= profileUser.profilePic %>" alt="Profile Picture" class="avatar-img">
+      <% } else { %>
+        <div class="avatar-placeholder">
+          <%= profileUser.username.charAt(0).toUpperCase() %>
+        </div>
+      <% } %>
     </div>
+    
     <div class="profile-info">
       <h1><%= profileUser.username %></h1>
       <% if (profileUser.bio) { %>
@@ -19,7 +26,7 @@
       <% } %>
       
       <% if (currentUser && profileUser && currentUser._id.toString() === profileUser._id.toString()) { %>
-        <a href="/profile/edit" class="edit-profile-btn">Edit Profile</a>
+        <a href="/profile/edit/<%= currentUser._id %>" class="edit-profile-btn">Edit Profile</a>
       <% } %>
     </div>
   </section>

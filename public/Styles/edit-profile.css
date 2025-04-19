@@ -1,153 +1,71 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #b48114;
+  margin: 0;
+  padding: 0;
+}
+
 .edit-profile-container {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 0 1rem;
+  max-width: 600px;
+  margin: 60px auto;
+  background: #0f5c69;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  color: white;
 }
 
-.edit-profile-card {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  padding: 2rem;
+.edit-profile-container h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2rem;
+  color: #333;
 }
 
-.avatar-upload {
-  display: flex;
-  gap: 2rem;
-  margin-bottom: 2rem;
-  align-items: center;
-}
-
-.avatar-preview {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f0f2f5;
-  position: relative;
-}
-
-.avatar-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.default-avatar {
-  font-size: 3rem;
-  color: #555;
-}
-
-.avatar-controls {
+form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
-.upload-btn, .remove-btn {
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-}
-
-.upload-btn {
-  background: #1877f2;
-  color: white;
-  border: none;
-}
-
-.remove-btn {
-  background: #f0f2f5;
-  color: #555;
-  border: 1px solid #ddd;
-}
-
-#avatar {
-  display: none;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
+label {
   font-weight: 600;
+  margin-bottom: 6px;
+  color: white;
 }
 
-.form-group input, .form-group textarea {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 1rem;
+input[type="text"],
+textarea,
+input[type="file"] {
+  padding: 10px 14px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
 }
 
-.form-group textarea {
+input[type="text"]:focus,
+textarea:focus {
+  border-color: #4a90e2;
+  outline: none;
+}
+
+textarea {
   min-height: 100px;
   resize: vertical;
 }
 
-.char-counter {
-  text-align: right;
-  font-size: 0.8rem;
-  color: #777;
-  margin-top: 0.25rem;
-}
-
-.social-input {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.social-input i {
-  font-size: 1.2rem;
-  color: #555;
-  width: 30px;
-}
-
-.privacy-option {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.save-btn, .cancel-btn {
-  padding: 0.75rem 1.5rem;
-  border-radius: 5px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.save-btn {
-  background: #1877f2;
+button[type="submit"] {
+  background-color: #4a90e2;
   color: white;
+  padding: 12px 20px;
+  font-size: 16px;
   border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
-.cancel-btn {
-  background: #f0f2f5;
-  color: #555;
-  border: none;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+button[type="submit"]:hover {
+  background-color: #357abd;
 }

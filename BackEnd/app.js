@@ -13,31 +13,35 @@ const fs = require('fs').promises; // Use promises version for async/await
 const User = require('./Models/user');
 const Message = require('./Models/Message');
 
+
+
 const app = express();
 
 //MongoDB connection:
 
 
-// Replace your current connection with this:
 async function connectDB() {
   try {
-    await mongoose.connect('mongodb+srv://Musala001:%2APatricia123%23@cluster0.otlfit6.mongodb.net/chatapp?retryWrites=true&w=majority', {
-      serverSelectionTimeoutMS: 5000  // 5 seconds timeout
+    await mongoose.connect('mongodb://127.0.0.1:27017/chatapp', {
+      serverSelectionTimeoutMS: 5000, // 5 seconds timeout
     });
-    console.log('MongoDB Connected');
+    console.log('✅ MongoDB Connected to localhost');
 
-    // Test connection by inserting a document
-    const testDoc = await mongoose.connection.db.collection('test').insertOne({ test: true });
-    console.log('Test document inserted:', testDoc.insertedId);
-
+    // Test insert
+    const testDoc = await mongoose.connection.db
+      .collection('test')
+      .insertOne({ test: true });
+    console.log('📝 Test document inserted:', testDoc.insertedId);
   } catch (err) {
-    console.error('MongoDB Connection Failed:', err);
+    console.error('❌ MongoDB Connection Failed:', err);
     process.exit(1);
   }
 }
 
-
 connectDB();
+
+
+
 // 2. Add the connection event handlers RIGHT AFTER the connection
 mongoose.connection.on('connected', () => {
   console.log('Mongoose connected to DB');
@@ -59,6 +63,7 @@ mongoose.connection.on('connected', () => {
 // Middleware
 app.use(express.json()); // Add this line
 app.use(express.static(path.join(__dirname, '../FrontEnd')));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
@@ -301,14 +306,16 @@ app.use((req, res, next) => {
 // Routes
 
 // ========== Authentication Routes ==========
-// Update your login/register routes to handle header properly
-// Update your root route to properly redirect
+
+
 app.get('/', (req, res) => {
-  if (req.session.user) {
-    return res.redirect('/friends');
-  }
-  res.redirect('/register');
+  if (req.session.user) return res.redirect('/register');
+  res.render('Welcome', { 
+    title: 'Welcome',
+    stylesheets: ['/Styles/welcome.css'] 
+  });
 });
+
 app.get('/login', (req, res) => {
   if (req.session.user) return res.redirect('/friends');
   res.render('login', { 
@@ -436,61 +443,6 @@ app.get('/add-friend/:userId', async (req, res) => {
   res.redirect('/friends');
 });
 
-// ========== Chat Routes ==========
-// In your route handler for /chat
-// General chat page (no specific friend selected)
-// General chat page (no specific friend selected)
-app.get('/chat', async (req, res) => {
-  if (!req.session.user) return res.redirect('/login');
-  
-  try {
-    const user = await User.findById(req.session.user._id).populate('friends');
-    
-    res.render('chat', {
-      currentUser: req.session.user,  // Pass the logged-in user
-      friends: user.friends,         // Array of friend objects
-      messages: [],                  // Empty array when no friend selected
-      currentChatFriend: null,       // No friend selected initially
-      title: 'Chat',
-      stylesheets: ['/Styles/chat.css']
-    });
-  } catch (err) {
-    console.error(err);
-    res.redirect('/login');
-  }
-});
-
-// Specific chat conversation
-// Update your /chat/:friendId route
-// Specific chat conversation
-app.get('/chat/:friendId', async (req, res) => {
-  if (!req.session.user) return res.redirect('/login');
-  
-  try {
-    const user = await User.findById(req.session.user._id).populate('friends');
-    const messages = await Message.find({
-      $or: [
-        { sender: req.session.user._id, receiver: req.params.friendId },
-        { sender: req.params.friendId, receiver: req.session.user._id }
-      ]
-    })
-    .populate('sender', 'username')  // Only get the username
-    .sort('timestamp');
-
-    res.render('chat', {
-      currentUser: req.session.user,
-      friends: user.friends,
-      messages: messages,
-      currentChatFriend: req.params.friendId,
-      title: `Chat with ${user.friends.find(f => f._id.equals(req.params.friendId))?.username || 'Friend'}`,
-      stylesheets: ['/Styles/chat.css']
-    });
-  } catch (err) {
-    console.error(err);
-    res.redirect('/chat');
-  }
-});
-
 
 app.post('/send-message', async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
@@ -507,15 +459,19 @@ app.post('/send-message', async (req, res) => {
 });
 
 // ========== Posts Routes ==========
-// ========== Posts Routes ==========
+
 app.get('/posts', async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
-  
+
   try {
     const posts = await Post.find()
       .populate('author', 'username')
+      .populate({
+        path: 'comments.author',
+        select: 'username'
+      })
       .sort({ createdAt: -1 });
-      
+
     res.render('posts', { 
       posts,
       title: 'Posts',
@@ -592,20 +548,27 @@ app.post('/posts/:id/comment', async (req, res) => {
     };
 
     post.comments.push(newComment);
-    await post.save();
+    await post.save(); // Save the post with the new comment
 
-    // Properly populate the author information when fetching
-    const populatedPost = await Post.findById(post._id)
+    // Populate the author field for both the post and comments
+    const populatedPost = await Post.findById(req.params.id) // Use req.params.id here
+      .populate('author', 'username')  // Populate the author of the post with the username
       .populate({
-        path: 'comments.author',
-        select: 'username'  // Only get the username field
-      });
+        path: 'comments',
+        populate: {
+          path: 'author',  // Populate the author field of each comment
+          select: 'username'  // Only retrieve the username of the author
+        }
+      })
+      .exec();
 
     // Get the newly added comment (last in array)
     const addedComment = populatedPost.comments[populatedPost.comments.length - 1];
 
+    // Send the response with the populated data
     res.json({
       success: true,
+      post: populatedPost, // Ensure we send the entire post object with populated author and comments
       comment: {
         _id: addedComment._id,
         text: addedComment.text,
@@ -622,6 +585,9 @@ app.post('/posts/:id/comment', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+
+
 // DELETE post route
 
 
@@ -753,35 +719,62 @@ app.get('/profile/:userId', async (req, res) => {
   }
 });
 
-// Profile Edit Route
-app.get('/profile/edit', (req, res) => {
-  if (!req.session.user) return res.redirect('/login');
-  res.render('edit-profile', {
-    user: req.session.user,
-    title: 'Edit Profile'
-  });
+// Route for editing the profile
+app.get('/profile/edit/:userId', async (req, res) => {
+  try {
+    if (!req.session.user) {
+      console.log('User not logged in');
+      return res.redirect('/login');
+    }
+
+    console.log('Session user:', req.session.user);
+
+    const user = await User.findById(req.session.user._id);
+    if (!user) {
+      console.log('User not found in database');
+      return res.status(404).send('User not found');
+    }
+
+    console.log('User loaded:', user);
+
+    res.render('edit-profile', { currentUser: user });
+  } catch (err) {
+    console.error('Error in GET /profile/edit:', err);
+    res.status(500).send('Server Error');
+  }
 });
 
-// Profile Update Route
-app.post('/profile/update', async (req, res) => {
+
+// Handle profile picture upload and other profile edits
+app.post('/profile/edit/:userId', upload.single('profilePic'), async (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
   try {
-    if (!req.session.user) return res.redirect('/login');
-    
-    const { username, bio } = req.body;
-    
-    const updatedUser = await User.findByIdAndUpdate(
-      req.session.user._id,
-      { username, bio },
-      { new: true }
-    );
-    
-    // Update session with new data
+    const userId = req.params.userId;
+
+    // Create update object
+    const updates = {
+      name: req.body.name,
+      bio: req.body.bio
+    };
+
+    // If a profile picture was uploaded, include it
+    if (req.file) {
+      updates.profilePic = `/uploads/${req.file.filename}`;
+    }
+
+    // Update the user in the database
+    const updatedUser = await User.findByIdAndUpdate(userId, updates, { new: true });
+
+    // Update session so that changes reflect immediately
     req.session.user = updatedUser;
-    res.redirect('/profile/' + updatedUser._id);
-    
+
+    res.redirect(`/profile/${userId}`);
   } catch (err) {
-    console.error(err);
-    res.redirect('/profile/edit');
+    console.error('Error updating profile:', err);
+    res.status(500).send('Server Error');
   }
 });
 
@@ -819,54 +812,159 @@ app.post('/api/voice-message', voiceUpload.single('voice'), async (req, res) => 
     res.status(500).json({ success: false, error: 'Failed to send voice message' });
   }
 });
-// ========== Socket.IO Setup ==========
-const server = require('http').createServer(app);
-const io = require('socket.io')(server);
 
-io.on('connection', (socket) => {
-  console.log('New connection:', socket.id);
+app.get('/api/messages/:userId1/:userId2', async (req, res) => {
+  const { userId1, userId2 } = req.params;
 
-  socket.on('join-chat', ({ userId, friendId }) => {
-    const room = `chat_${[userId, friendId].sort().join('_')}`;
-    socket.join(room);
-    console.log(`Socket ${socket.id} joined room: ${room}`);
-  });
+  try {
+    const messages = await Message.find({
+      $or: [
+        { sender: userId1, receiver: userId2 },
+        { sender: userId2, receiver: userId1 }
+      ]
+    }).sort({ timestamp: 1 });
 
-  socket.on('send-message', async (data) => {
-    console.log('Received message data:', {
-      from: data.sender,
-      to: data.receiver,
-      content: data.content.substring(0, 50)
+    res.json(messages);
+  } catch (err) {
+    console.error('Error fetching messages:', err);
+    res.status(500).json({ error: 'Failed to fetch messages' });
+  }
+});
+
+// ========== Chat Routes ==========
+// In your route handler for /chat
+// General chat page (no specific friend selected)
+// General chat page (no specific friend selected)
+app.get('/chat', async (req, res) => {
+  if (!req.session.user) return res.redirect('/login');
+  
+  try {
+    const user = await User.findById(req.session.user._id).populate('friends');
+
+    res.render('chat', {
+      currentUser: req.session.user,
+      friends: user.friends,
+      groups: groups,
+      messages: [],
+      currentChatFriend: null,
+      title: 'Chat',
+      stylesheets: ['/Styles/chat.css']
     });
-
-    try {
-      const message = new Message({
-        sender: data.sender,
-        receiver: data.receiver,
-        content: data.content
-      });
-
-      const savedMessage = await message.save();
-      console.log('Message saved with ID:', savedMessage._id);
-
-      const populated = await Message.populate(savedMessage, [
-        { path: 'sender', select: 'username' },
-        { path: 'receiver', select: 'username' }
-      ]);
-
-      const room = `chat_${[data.sender, data.receiver].sort().join('_')}`;
-      console.log('Emitting to room:', room);
-
-      io.to(room).emit('new-message', populated);
-
-    } catch (err) {
-      console.error('Full error:', err);
-      socket.emit('message-error', {
-        error: 'Failed to send message',
-        details: err.message
-      });
-    }
-  });
+  } catch (err) {
+    console.error(err);
+    res.redirect('/login');
+  }
 });
 
 
+
+// Update your /chat/:friendId route
+// Specific chat conversation
+app.get('/chat/:friendId', async (req, res) => {
+  if (!req.session.user) return res.redirect('/login');
+  
+  try {
+    const user = await User.findById(req.session.user._id).populate('friends');
+    const messages = await Message.find({
+      $or: [
+        { sender: req.session.user._id, receiver: req.params.friendId },
+        { sender: req.params.friendId, receiver: req.session.user._id }
+      ]
+    })
+    .populate('sender', 'username')  // Only get the username
+    .sort('timestamp');
+
+    res.render('chat', {
+      currentUser: req.session.user,
+      friends: user.friends,
+      messages: messages,
+      currentChatFriend: req.params.friendId,
+      title: `Chat with ${user.friends.find(f => f._id.equals(req.params.friendId))?.username || 'Friend'}`,
+      stylesheets: ['/Styles/chat.css']
+    });
+  } catch (err) {
+    console.error(err);
+    res.redirect('/chat');
+  }
+});
+
+app.post('/api/send', upload.single('file'), async (req, res) => {
+  try {
+    const { senderId, receiverId, content } = req.body;
+    const file = req.file;
+
+    const newMsg = await Message.create({
+      sender: senderId,
+      receiver: receiverId,
+      content,
+      filePath: file ? file.path : null,
+      fileType: file ? file.mimetype : null
+    });
+
+    res.json(newMsg);
+  } catch (err) {
+    console.error('Attachment send error:', err);
+    res.status(500).send('Error sending message');
+  }
+});
+// ========== Socket.IO Setup ==========
+
+const server = require('http').createServer(app);
+const io = require('socket.io')(server, {
+  cors: {
+    origin: "http://localhost:3000", // Adjust to your client URL
+    methods: ["GET", "POST"]
+  }
+});
+
+// Store connected users
+io.on('connection', (socket) => {
+  console.log('Client connected:', socket.id);
+
+  socket.on('joinRoom', (roomId) => {
+    console.log(`Socket ${socket.id} joining room ${roomId}`);
+    socket.join(roomId);
+  });
+
+  socket.on('sendMessage', async (msg) => {
+    try {
+      // Save the message to the database
+      const savedMessage = await Message.create({
+        sender: msg.senderId,
+        receiver: msg.receiverId,
+        content: msg.content
+      });
+
+      const roomId = [msg.senderId, msg.receiverId].sort().join('_');
+      console.log(`Message saved and sent to room ${roomId}:`, savedMessage);
+
+      // Emit the saved message to the room
+      io.to(roomId).emit('receiveMessage', savedMessage);
+    } catch (err) {
+      console.error('Error saving message:', err);
+    }
+  });
+
+  socket.on('typing', ({ roomId, senderId }) => {
+    socket.to(roomId).emit('displayTyping', { senderId });
+  });
+
+  socket.on('stopTyping', ({ roomId, senderId }) => {
+    socket.to(roomId).emit('hideTyping', { senderId });
+  });
+
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
+  });
+});
+
+module.exports = server;
+
+const PORT = process.env.PORT || 3000;
+
+// Start the server
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Socket.IO endpoint available at ws://localhost:${PORT}`);
+});

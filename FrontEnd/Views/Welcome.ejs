@@ -1,0 +1,57 @@
+<%- include('../Partials/head', { 
+    title: 'Welcome to WILDChat',
+    stylesheets: ['/Styles/welcome.css'] 
+  }) %>
+  
+  <%- include('../Partials/header', { title: 'Welcome' }) %>
+  
+  <main class="welcome-main">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Welcome to <span>WILDChat</span></h1>
+        <p>The perfect place to connect, share, and discover amazing content!</p>
+        <div class="hero-buttons">
+          <a href="/login" class="btn login-btn">Login</a>
+          <a href="/register" class="btn signup-btn">Sign Up</a>
+        </div>
+      </div>
+    </section>
+  
+    <!-- Features Section -->
+    <section class="features">
+      <h2>What can you do on WILDChat?</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3>Find Friends</h3>
+          <p>Discover people who share your interests and make new connections!</p>
+        </div>
+        <div class="feature-card">
+          <h3>Share Posts</h3>
+          <p>Express yourself, share your thoughts, and engage with others!</p>
+        </div>
+        <div class="feature-card">
+          <h3>Discover Cool Stuff</h3>
+          <p>Explore exciting content — from anime theories to F1 updates!</p>
+        </div>
+      </div>
+    </section>
+  
+    <!-- About Section -->
+    <section class="about">
+      <h2>Who Created WILDChat?</h2>
+      <p>WILDChat was created by a passionate individual who loves <strong>anime</strong>, <strong>F1 racing</strong>, and <strong>connecting with people</strong>. I may not talk about myself a lot, but I do believe in <strong>creating something that makes a difference</strong> in your day. So why not have a bit of fun, right?</p>
+      <p>I'm a big fan of shows like <strong>Attack on Titan</strong>, <strong>Solo Leveling</strong>, and <strong>Classroom of the Elite</strong>. As for F1, I'm totally hooked on <strong>Max Verstappen</strong> and his amazing victories!</p>
+      <p>But hey, this isn't about me. WILDChat is all about <strong>you</strong>! This is your space to explore, engage, and make new memories. Are you ready to start?</p>
+    </section>
+  
+    <!-- Convince Section -->
+    <section class="convince">
+      <h2>Why Choose WILDChat?</h2>
+      <p>WILDChat isn’t just another app. It's where <strong>anime lovers</strong>, <strong>F1 fans</strong>, and <strong>everyone else</strong> come together. Whether you’re sharing your favorite anime moments or discussing the latest F1 race, there’s always something happening.</p>
+      <p>It's simple, fun, and totally free. Let’s build a community where everyone has a place. So what are you waiting for? Jump in and join the fun!</p>
+    </section>
+  </main>
+  
+  <%- include('../Partials/footer') %>
+  

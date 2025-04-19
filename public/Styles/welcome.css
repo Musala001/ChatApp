@@ -1,0 +1,160 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Body Styling */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    line-height: 1.6;
+  }
+  
+  /* Welcome Main Section */
+  .welcome-main {
+    width: 100%;
+    padding: 50px 20px;
+    text-align: center;
+  }
+  
+  /* Hero Section */
+  .hero {
+    background-color: #1ba398;
+    color: white;
+    padding: 100px 20px;
+    text-align: center;
+  }
+  
+  .hero-content h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+  }
+  
+  .hero-content span {
+    color: #ffeb3b;
+  }
+  
+  .hero-content p {
+    font-size: 1.25rem;
+    margin-bottom: 40px;
+  }
+  
+  .hero-buttons .btn {
+    padding: 10px 20px;
+    text-decoration: none;
+    margin: 10px;
+    border-radius: 5px;
+    color: white;
+    font-size: 1.125rem;
+    transition: background-color 0.3s;
+  }
+  
+  .hero-buttons .login-btn {
+    background-color: #00796b;
+  }
+  
+  .hero-buttons .login-btn:hover {
+    background-color: #004d40;
+  }
+  
+  .hero-buttons .signup-btn {
+    background-color: #ffeb3b;
+  }
+  
+  .hero-buttons .signup-btn:hover {
+    background-color: #fbc02d;
+  }
+  
+  /* Features Section */
+  .features {
+    padding: 60px 20px;
+    background-color: #fafafa;
+  }
+  
+  .features h2 {
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+  }
+  
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .feature-card {
+    background-color: rgb(199, 220, 221);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-10px);
+  }
+  
+  .feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
+  
+  .feature-card p {
+    font-size: 1rem;
+  }
+  
+  /* About Section */
+  .about {
+    padding: 60px 20px;
+    text-align: center;
+    background-color: #9fcfc5;
+  }
+  
+  .about h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .about p {
+    font-size: 1.125rem;
+    margin-bottom: 20px;
+  }
+  
+  /* Convince Section */
+  .convince {
+    padding: 60px 20px;
+    background-color: #b5d4d2;
+    text-align: center;
+  }
+  
+  .convince h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .convince p {
+    font-size: 1.125rem;
+    margin-bottom: 20px;
+  }
+  
+  /* Footer Section */
+  footer {
+    padding: 20px;
+    background-color: #333;
+    color: white;
+    text-align: center;
+  }
+  
+  footer a {
+    color: #ffeb3b;
+    text-decoration: none;
+    font-size: 1rem;
+  }
+  
+  footer a:hover {
+    text-decoration: underline;
+  }
+  

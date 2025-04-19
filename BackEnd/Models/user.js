@@ -4,9 +4,10 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  friends: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  bio: String
+  name: { type: String }, // ✅ Add this
+  bio: String,
+  profilePic: { type: String }, // ✅ Add this
+  friends: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 });
 
-// Make sure this line is present:
 module.exports = mongoose.model('User', userSchema);

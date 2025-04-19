@@ -1,108 +1,158 @@
+/* General Layout */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #1e1e2c;
+  margin: 0;
+  padding: 0;
+}
+
 .profile-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  .profile-header {
-    display: flex;
-    align-items: center;
-    gap: 30px;
-    margin-bottom: 40px;
-  }
-  
-  .profile-avatar {
-    width: 100px;
-    height: 100px;
-    background: #1877f2;
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px;
-    font-weight: bold;
-  }
-  
-  .profile-info h1 {
-    margin: 0 0 10px 0;
-    font-size: 32px;
-  }
-  
-  .profile-bio {
-    color: #65676b;
-    font-size: 16px;
-    max-width: 600px;
-  }
-  
-  .edit-profile-btn {
-    display: inline-block;
-    padding: 8px 16px;
-    background: #e4e6eb;
-    color: #050505;
-    border-radius: 6px;
-    text-decoration: none;
-    margin-top: 10px;
-  }
-  
-  .friends-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-  }
-  
-  .friend-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: inherit;
-  }
-  
-  .friend-avatar {
-    width: 60px;
-    height: 60px;
-    background: #e4e6eb;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    margin-bottom: 8px;
-  }
-  
-  .profile-posts {
-    margin-top: 40px;
-  }
-  
-  .posts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
-  }
-  
-  .profile-post {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  
-  .profile-post img,
-  .profile-post video {
-    width: 100%;
-    max-height: 300px;
-    object-fit: cover;
-  }
-  
-  .profile-post p {
-    padding: 15px;
-    margin: 0;
-  }
-  
-  .no-posts {
-    color: #65676b;
-    text-align: center;
-    padding: 40px 0;
-  }
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+  color: white;
+}
+
+/* Profile Header */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 40px;
+  background: #c4650d;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #ac7c22;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.avatar-placeholder {
+  font-size: 48px;
+  color: #c08413;
+  background-color: #6c5ce7;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  line-height: 120px;
+  font-weight: bold;
+  border-radius: 50%;
+}
+
+.profile-info h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #2d3436;
+}
+
+.profile-bio {
+  font-style: italic;
+  color: #636e72;
+  margin: 8px 0;
+}
+
+.edit-profile-btn {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #1d3141;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  margin-top: 10px;
+  transition: background-color 0.2s ease;
+}
+
+.edit-profile-btn:hover {
+  background-color: #74b9ff;
+}
+
+/* Friends Section */
+.profile-friends {
+  margin-bottom: 40px;
+}
+
+.friends-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.friend-card {
+  background-color: rgb(23, 179, 30);
+  padding: 10px;
+  border-radius: 10px;
+  width: 120px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  text-decoration: none;
+  color: #2d3436;
+  transition: transform 0.2s;
+}
+
+.friend-card:hover {
+  transform: translateY(-3px);
+}
+
+.friend-avatar {
+  width: 60px;
+  height: 60px;
+  background-color: #1445cc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 24px;
+  margin: 0 auto 5px;
+}
+
+/* Posts Section */
+.profile-posts h2 {
+  margin-bottom: 20px;
+}
+
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.profile-post {
+  background: rgb(11, 143, 167);
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.04);
+  text-align: center;
+}
+
+.profile-post img,
+.profile-post video {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  max-height: 250px;
+  object-fit: cover;
+}
+
+.no-posts {
+  text-align: center;
+  color: #b2bec3;
+  font-style: italic;
+}

@@ -5,6 +5,7 @@
 <%- include('../Partials/header', { title: 'Posts' }) %>
 
 <main class="posts-container">
+  <h1>View Posts and share whats on ur wild mind</h1>
   <section class="create-post">
     <form action="/posts" method="POST" enctype="multipart/form-data" id="post-form">
       <textarea name="content" placeholder="What's on your mind?" required></textarea>
@@ -29,7 +30,6 @@
             <span class="post-time"><%= new Date(post.createdAt).toLocaleString() %></span>
           </div>
           <!-- TEMPORARY DEBUG - REMOVE LATER -->
-
           <% if (currentUser && currentUser._id.toString() === post.author._id.toString()) { %>
             <button class="delete-post-btn" data-post-id="<%= post._id %>">
               <i class="fas fa-trash"></i>
@@ -65,14 +65,21 @@
           <div class="comments-list">
             <% if (post.comments && post.comments.length > 0) { %>
               <% post.comments.forEach(comment => { %>
+                <script>
+                  console.log('<%= comment.author.username %>');
+                </script>
                 <div class="comment" data-comment-id="<%= comment._id %>">
-                  <div class="comment-author"><%= comment.author.username %>:</div>
+                  <div class="comment-author">
+                    <%= comment.author.username %>: <!-- Corrected this line -->
+                  </div>
                   <div class="comment-text"><%= comment.text %></div>
                   <button class="delete-comment-btn" data-comment-id="<%= comment._id %>" data-post-id="<%= post._id %>">
                     <i class="fas fa-trash"></i>
                   </button>
                 </div>
               <% }); %>
+              
+              
             <% } else { %>
               <div class="no-comments">No comments yet</div>
             <% } %>
@@ -82,6 +89,7 @@
             <button type="submit">Post</button>
           </form>
         </div>
+        
       </div>
     <% }); %>
   </section>
