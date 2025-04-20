@@ -303,6 +303,7 @@ app.post('/send-message', async (req, res) => {
 // ========== Posts Routes ==========
 
 app.get('/posts', async (req, res) => {
+  console.log('GET /posts hit');
   if (!req.session.user) return res.redirect('/login');
 
   try {
@@ -313,6 +314,8 @@ app.get('/posts', async (req, res) => {
         select: 'username'
       })
       .sort({ createdAt: -1 });
+      
+      console.log('Rendering posts.ejs with', posts.length, 'posts');
 
     res.render('posts', { 
       posts,
