@@ -9,6 +9,8 @@ const multer = require('multer');
 
 const Post = require('./Models/Post'); // You'll need to create this model
 const fs = require('fs').promises; // Use promises version for async/await
+const fsp = require('fs').promises;
+
 
 const User = require('./Models/user');
 const Message = require('./Models/Message');
@@ -314,7 +316,7 @@ app.get('/posts', async (req, res) => {
         select: 'username'
       })
       .sort({ createdAt: -1 });
-      
+
       console.log('Rendering posts.ejs with', posts.length, 'posts');
 
     res.render('posts', { 
