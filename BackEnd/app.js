@@ -335,6 +335,12 @@ app.get('/posts', async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
 
   try {
+    res.render('posts', {
+      posts,
+      currentUser: req.session.user, // this is required by your EJS
+      title: 'Posts',
+      stylesheets: ['/Styles/posts.css']
+    });
     const posts = await Post.find()
       .populate('author', 'username')
       .populate({
@@ -343,12 +349,7 @@ app.get('/posts', async (req, res) => {
       })
       .sort({ createdAt: -1 });
 
-    res.render('posts', {
-      posts,
-      currentUser: req.session.user, // this is required by your EJS
-      title: 'Posts',
-      stylesheets: ['/Styles/posts.css']
-    });
+    
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');
