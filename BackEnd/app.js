@@ -306,7 +306,7 @@ app.post('/send-message', async (req, res) => {
 
 // ========== Posts Routes ==========
 
-app.get('/posts', async (req, res) => {
+/*app.get('/posts', async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
 
   try {
@@ -327,7 +327,28 @@ app.get('/posts', async (req, res) => {
     console.error(err);
     res.status(500).send('Server Error');
   }
+}); */
+
+
+app.get('/posts', async (req, res) => {
+  if (!req.session.user) return res.redirect('/login');
+
+  try {
+    const posts = await Post.find()
+      .populate('author', 'username')
+      .populate({
+        path: 'comments.author',
+        select: 'username'
+      })
+      .sort({ createdAt: -1 });
+
+    res.json({ posts }); // Temporarily returning posts as JSON to check if data is fetched correctly
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
 });
+
 
 app.post('/posts', upload.single('media'), async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
@@ -340,18 +361,20 @@ app.post('/posts', upload.single('media'), async (req, res) => {
     });
 
     if (req.file) {
-      const result = await streamUpload(req.file.buffer, 'your-folder-name', req.file.mimetype);
-      newPost.mediaUrl = result.secure_url;
+      console.log('Uploaded file:', req.file);
+
+      newPost.mediaUrl = '/uploads/' + req.file.filename;
       newPost.mediaType = req.file.mimetype;
     }
 
     await newPost.save();
     res.redirect('/posts');
   } catch (err) {
-    console.error(err);
+    console.error('Error creating post:', err); // This will help you debug
     res.status(500).send('Server Error');
   }
 });
+
 
 app.post('/posts/:id/like', async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
