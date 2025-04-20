@@ -81,7 +81,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../FrontEnd/Views'));
 const viewsPath = path.join(__dirname, '../FrontEnd/Views');
 console.log('Checking for posts.ejs in:', viewsPath);
-console.log('Contents:', fs.readdirSync(viewsPath));
+
 // Multer configuration for file uploads
 // Configure multer for file uploads
 // Multer configuration for file uploads
