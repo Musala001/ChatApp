@@ -77,8 +77,9 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 app.use(express.urlencoded({ extended: true }));
-// app.set('view engine', 'ejs');
-// app.set('views', path.join(__dirname, '../FrontEnd/Views'));
+ app.set('view engine', 'ejs');
+ app.set('views', path.join(__dirname, '../FrontEnd/Views'));
+
 
 // Multer configuration for file uploads
 // Configure multer for file uploads
@@ -347,7 +348,7 @@ app.post('/posts', upload.single('media'), async (req, res) => {
     }
 
     await newPost.save();
-    res.redirect('/posts');
+    res.redirect('/Posts');
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');
