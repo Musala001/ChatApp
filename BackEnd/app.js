@@ -4,19 +4,18 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const path = require('path');
 const bcrypt = require('bcryptjs');
-
+//for posts
+const multer = require('multer');
 
 const Post = require('./Models/Post'); // You'll need to create this model
 const fs = require('fs').promises; // Use promises version for async/await
 
 const User = require('./Models/user');
 const Message = require('./Models/Message');
-const multer = require('multer');
-const cloudinary = require('cloudinary').v2;
-const { Readable } = require('stream');
 
 
 require('dotenv').config();
+const cloudinary = require('cloudinary').v2;
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -76,18 +75,33 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 app.use(express.urlencoded({ extended: true }));
-app.set('views', path.join(__dirname, '../FrontEnd/Views'));
 app.set('view engine', 'ejs');
-
+app.set('views', path.join(__dirname, '../FrontEnd/Views'));
 
 // Multer configuration for file uploads
-
-// Memory storage instead of disk
-const storage = multer.memoryStorage();
+// Configure multer for file uploads
+// Multer configuration for file uploads
+// Ensure uploads directory exists
+(async () => {
+  const uploadsDir = path.join(__dirname, '../public/uploads/');
+  try {
+    await fsp.mkdir(uploadsDir, { recursive: true });
+  } catch (err) {
+    console.error('Failed to create uploads directory:', err);
+  }
+})();
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '../public/uploads/'));
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
 
 const upload = multer({ 
-  storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
       cb(null, true);
@@ -96,25 +110,6 @@ const upload = multer({
     }
   }
 });
-
-const streamUpload = (buffer, folder, mimetype) => {
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      { folder, resource_type: mimetype.startsWith('video/') ? 'video' : 'image' },
-      (error, result) => {
-        if (result) resolve(result);
-        else reject(error);
-      }
-    );
-    const readable = new Readable();
-    readable._read = () => {}; // no-op
-    readable.push(buffer);
-    readable.push(null);
-    readable.pipe(stream);
-  });
-};
-
-
 
 
 
@@ -307,7 +302,7 @@ app.post('/send-message', async (req, res) => {
 
 // ========== Posts Routes ==========
 
-/*app.get('/posts', async (req, res) => {
+app.get('/posts', async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
 
   try {
@@ -328,39 +323,11 @@ app.post('/send-message', async (req, res) => {
     console.error(err);
     res.status(500).send('Server Error');
   }
-}); */
-
-
-app.get('/posts', async (req, res) => {
-  if (!req.session.user) return res.redirect('/login');
-
-  try {
-    res.render('posts', {
-      posts,
-      currentUser: req.session.user, // this is required by your EJS
-      title: 'Posts',
-      stylesheets: ['/Styles/posts.css']
-    });
-    const posts = await Post.find()
-      .populate('author', 'username')
-      .populate({
-        path: 'comments.author',
-        select: 'username'
-      })
-      .sort({ createdAt: -1 });
-
-    
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
-  }
 });
-
-
 
 app.post('/posts', upload.single('media'), async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
-
+  
   try {
     const { content } = req.body;
     const newPost = new Post({
@@ -369,8 +336,6 @@ app.post('/posts', upload.single('media'), async (req, res) => {
     });
 
     if (req.file) {
-      console.log('Uploaded file:', req.file);
-
       newPost.mediaUrl = '/uploads/' + req.file.filename;
       newPost.mediaType = req.file.mimetype;
     }
@@ -378,11 +343,10 @@ app.post('/posts', upload.single('media'), async (req, res) => {
     await newPost.save();
     res.redirect('/posts');
   } catch (err) {
-    console.error('Error creating post:', err); // This will help you debug
+    console.error(err);
     res.status(500).send('Server Error');
   }
 });
-
 
 app.post('/posts/:id/like', async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
