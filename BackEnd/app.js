@@ -321,7 +321,7 @@ app.get('/posts', async (req, res) => {
       console.log('Rendering posts.ejs with', posts.length, 'posts');
 console.log('Expecting posts.ejs at:', path.join(__dirname, '../FrontEnd/Views/posts.ejs'));
 
-    res.render('posts', { 
+    res.render('Posts', { 
       posts,
       title: 'Posts',
       stylesheets: ['/Styles/posts.css']
@@ -348,7 +348,7 @@ app.post('/posts', upload.single('media'), async (req, res) => {
     }
 
     await newPost.save();
-    res.redirect('/Posts');
+    res.redirect('/posts');
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');
@@ -627,40 +627,8 @@ app.post('/profile/edit/:userId', upload.single('profilePic'), async (req, res) 
   }
 });
 
-// Voice message endpoint
-const voiceUpload = multer({ dest: 'public/voice-notes/' });
 
 
-// Add this near your other route handlers
-
-app.post('/api/voice-message', voiceUpload.single('voice'), async (req, res) => {
-  try {
-    if (!req.session.user) {
-      return res.status(401).json({ success: false, error: 'Not authenticated' });
-    }
-
-    const { sender, receiver } = req.body;
-    const voiceUrl = '/voice-notes/' + req.file.filename;
-
-    const message = new Message({
-      sender,
-      receiver,
-      content: '[Voice message]',
-      voiceUrl,
-      timestamp: new Date()
-    });
-
-    await message.save();
-    
-    // Emit via Socket.IO
-    io.to(`chat_${[sender, receiver].sort().join('_')}`).emit('new-message', message);
-    
-    res.json({ success: true, message });
-  } catch (err) {
-    console.error('Error saving voice message:', err);
-    res.status(500).json({ success: false, error: 'Failed to send voice message' });
-  }
-});
 
 app.get('/api/messages/:userId1/:userId2', async (req, res) => {
   const { userId1, userId2 } = req.params;
@@ -684,7 +652,7 @@ app.get('/api/messages/:userId1/:userId2', async (req, res) => {
 // In your route handler for /chat
 // General chat page (no specific friend selected)
 // General chat page (no specific friend selected)
-app.get('/chat', async (req, res) => {
+/*app.get('/chat', async (req, res) => {
   if (!req.session.user) return res.redirect('/login');
   
   try {
@@ -704,7 +672,42 @@ app.get('/chat', async (req, res) => {
     res.redirect('/login');
   }
 });
+*/
+app.get('/chat', async (req, res) => {
+  if (!req.session.user) return res.redirect('/login');
 
+  try {
+    const userId = req.session.user._id;
+
+    // Get current user and their friends
+    const user = await User.findById(userId).populate('friends');
+
+    // Get all messages where the user is either the sender or receiver
+    const messages = await Message.find({
+      $or: [
+        { sender: userId },
+        { receiver: userId }
+      ]
+    })
+    .sort({ createdAt: 1 }) // sort chronologically
+    .populate('sender', 'username')  // optional: to show names
+    .populate('receiver', 'username');
+
+    res.render('chat', {
+      currentUser: req.session.user,
+      friends: user.friends,
+      groups: [], // optional if you implement group chat
+      messages,
+      currentChatFriend: null,
+      title: 'All Chats',
+      stylesheets: ['/Styles/chat.css']
+    });
+
+  } catch (err) {
+    console.error('Error fetching chats:', err);
+    res.status(500).send('Server Error');
+  }
+});
 
 
 // Update your /chat/:friendId route
