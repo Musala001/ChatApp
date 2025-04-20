@@ -13,18 +13,60 @@
       <form action="/profile/edit/<%= currentUser._id %>" method="POST" enctype="multipart/form-data">
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" value="<%= currentUser.name %>" required>
-      
+        
         <label for="bio">Bio:</label>
         <textarea id="bio" name="bio"><%= currentUser.bio %></textarea>
-      
+        
         <label for="profilePic">Profile Picture:</label>
-        <input type="file" id="profilePic" name="profilePic" accept="image/*">
-      
+        <div class="file-input-container">
+          <label class="file-input-label" id="fileInputLabel">
+            <span class="file-input-text">Choose a profile picture...</span>
+            <input type="file" id="profilePic" name="profilePic" accept="image/*">
+          </label>
+        </div>
+        
+        <% if (currentUser.profilePic) { %>
+          <div class="image-preview">
+            <p>Current Profile Picture:</p>
+            <img src="<%= currentUser.profilePic %>" alt="Current profile picture">
+          </div>
+        <% } %>
+        
         <button type="submit">Save Changes</button>
       </form>
       
-      
     </div>
+
+    <script>
+      // Update file input label when file is selected
+      document.getElementById('profilePic').addEventListener('change', function(e) {
+        const label = document.getElementById('fileInputLabel');
+        const fileName = e.target.files[0] ? e.target.files[0].name : 'Choose a profile picture...';
+        
+        label.querySelector('.file-input-text').textContent = fileName;
+        if (e.target.files[0]) {
+          label.classList.add('has-file');
+          
+          // Show preview of selected image
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            const preview = document.createElement('div');
+            preview.className = 'image-preview';
+            preview.innerHTML = '<p>New Profile Picture:</p><img src="' + event.target.result + '" alt="Preview">';
+            
+            const existingPreview = document.querySelector('.image-preview');
+            if (existingPreview) {
+              existingPreview.replaceWith(preview);
+            } else {
+              label.parentNode.after(preview);
+            }
+          }
+          reader.readAsDataURL(e.target.files[0]);
+        } else {
+          label.classList.remove('has-file');
+        }
+      });
+    </script>
   </body>
   
   <%- include('../Partials/footer') %>

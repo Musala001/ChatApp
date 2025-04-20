@@ -154,7 +154,7 @@ app.use((req, res, next) => {
 
 
 app.get('/', (req, res) => {
-  if (req.session.user) return res.redirect('/register');
+  //if (req.session.user) return res.redirect('/register');
   res.render('Welcome', { 
     title: 'Welcome',
     stylesheets: ['/Styles/welcome.css'] 

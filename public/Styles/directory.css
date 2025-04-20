@@ -1,170 +1,224 @@
-/* General Styles */
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f5f7fa;
-  margin: 0;
-  padding: 0;
-}
-
+/* === BASE STYLES === */
 main {
-  padding: 2rem;
-  max-width: 900px;
-  margin: auto;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-/* Section Title */
-section h2 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  color: #333;
+section {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 20px;
 }
 
-/* Search Bar */
+h2 {
+  color: var(--dark-color);
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
 .search-container {
   position: relative;
-  margin-bottom: 1.5rem;
-  width: 100%;
+  margin-bottom: 20px;
 }
 
 .search-icon {
   position: absolute;
   left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #aaa;
+  top: 12px;
+  color: #999;
 }
 
 #userSearch {
   width: 100%;
-  padding: 0.75rem 0.75rem 0.75rem 2.5rem;
-  border: 1px solid #ccc;
+  padding: 12px 15px 12px 40px;
+  border: 1px solid #ddd;
   border-radius: 25px;
   font-size: 1rem;
-  transition: border 0.3s ease;
+  outline: none;
+  transition: border-color 0.3s;
 }
 
 #userSearch:focus {
-  border-color: #007bff;
-  outline: none;
+  border-color: var(--primary-color);
 }
 
-/* Filter Tabs */
 .filter-tabs {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  padding-bottom: 5px;
 }
 
 .filter-tab {
-  padding: 0.5rem 1rem;
+  padding: 8px 15px;
+  background-color: #f0f0f0;
   border-radius: 20px;
-  background-color: #e9ecef;
   cursor: pointer;
-  user-select: none;
-  font-size: 0.95rem;
-  transition: background 0.3s ease, color 0.3s ease;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: all 0.3s;
 }
 
 .filter-tab.active {
-  background-color: #007bff;
-  color: #fff;
+  background-color: var(--primary-color);
+  color: white;
 }
 
-/* User List */
 .user-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: grid;
+  gap: 10px;
 }
 
 .user-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #fff;
-  padding: 1rem;
-  margin-bottom: 0.75rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-  transition: transform 0.2s ease;
+  padding: 12px 15px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .user-item:hover {
   transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* User Info */
 .user-info {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 12px;
 }
 
 .user-avatar {
   width: 40px;
   height: 40px;
-  background-color: #007bff;
-  color: #fff;
-  font-weight: bold;
   border-radius: 50%;
+  background-color: var(--primary-color);
+  color: white;
   display: flex;
-  align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  align-items: center;
+  font-weight: bold;
 }
 
 .user-name {
   font-weight: 500;
-  font-size: 1rem;
-  color: #333;
+  color: var(--dark-color);
 }
 
-/* Online/Offline Status */
 .user-status {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  margin-left: 0.5rem;
 }
 
 .status-online {
-  background-color: #28a745;
+  background-color: #4caf50;
 }
 
 .status-offline {
   background-color: #ccc;
 }
 
-/* Add Friend Button */
 .add-friend-btn {
-  display: flex;
-  align-items: center;
-  background-color: #17a2b8;
+  padding: 8px 15px;
+  background-color: var(--primary-color);
   color: white;
-  padding: 0.5rem 0.75rem;
-  border-radius: 25px;
+  border-radius: 20px;
   text-decoration: none;
   font-size: 0.9rem;
-  transition: background 0.3s ease;
-}
-
-.add-friend-btn i {
-  margin-right: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background-color 0.3s;
 }
 
 .add-friend-btn:hover {
-  background-color: #138496;
+  background-color: var(--secondary-color);
 }
 
-/* Responsive */
-@media (max-width: 600px) {
+/* === MOBILE STYLES === */
+@media (max-width: 768px) {
+  main {
+    padding: 15px;
+  }
+  
+  section {
+    padding: 15px;
+  }
+  
+  .filter-tabs {
+    gap: 8px;
+  }
+  
+  .filter-tab {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+  
   .user-item {
     flex-direction: column;
     align-items: flex-start;
+    gap: 10px;
   }
-
+  
   .add-friend-btn {
-    margin-top: 0.5rem;
+    align-self: flex-end;
+    padding: 6px 12px;
+    font-size: 0.85rem;
   }
+}
+
+/* === TABLET STYLES (769px - 1024px) === */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .user-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .user-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .add-friend-btn {
+    align-self: flex-end;
+  }
+}
+
+/* === DESKTOP STYLES (1025px and up) === */
+@media (min-width: 1025px) {
+  .user-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  section {
+    padding: 25px;
+  }
+  
+  .filter-tabs {
+    gap: 15px;
+  }
+  
+  .filter-tab {
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
+}
+
+/* === NO RESULTS STATE === */
+.user-list:empty::after {
+  content: "No users found matching your criteria";
+  display: block;
+  text-align: center;
+  padding: 20px;
+  color: #888;
+  grid-column: 1 / -1;
 }
