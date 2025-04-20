@@ -79,7 +79,9 @@ app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../FrontEnd/Views'));
-
+const viewsPath = path.join(__dirname, '../FrontEnd/Views');
+console.log('Checking for posts.ejs in:', viewsPath);
+console.log('Contents:', fs.readdirSync(viewsPath));
 // Multer configuration for file uploads
 // Configure multer for file uploads
 // Multer configuration for file uploads
@@ -318,6 +320,7 @@ app.get('/posts', async (req, res) => {
       .sort({ createdAt: -1 });
 
       console.log('Rendering posts.ejs with', posts.length, 'posts');
+console.log('Expecting posts.ejs at:', path.join(__dirname, '../FrontEnd/Views/posts.ejs'));
 
     res.render('posts', { 
       posts,
