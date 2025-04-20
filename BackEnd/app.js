@@ -76,8 +76,9 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 app.use(express.urlencoded({ extended: true }));
-app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../FrontEnd/Views'));
+app.set('view engine', 'ejs');
+
 
 // Multer configuration for file uploads
 
@@ -342,12 +343,18 @@ app.get('/posts', async (req, res) => {
       })
       .sort({ createdAt: -1 });
 
-    res.json({ posts }); // Temporarily returning posts as JSON to check if data is fetched correctly
+    res.render('posts', {
+      posts,
+      currentUser: req.session.user, // this is required by your EJS
+      title: 'Posts',
+      stylesheets: ['/Styles/posts.css']
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');
   }
 });
+
 
 
 app.post('/posts', upload.single('media'), async (req, res) => {
