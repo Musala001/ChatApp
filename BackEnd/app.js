@@ -29,19 +29,12 @@ const app = express();
 
 //MongoDB connection:
 // MongoDB connection:
+// MongoDB connection:
 async function connectDB() {
   try {
     await mongoose.connect(process.env.MONGO_URI, {
       serverSelectionTimeoutMS: 5000
     });
-
-    console.log('✅ MongoDB Connected to Atlas');
-  } catch (err) {
-    console.error('❌ MongoDB Connection Failed:', err);
-    process.exit(1); // Exit if DB fails
-  }
-}
-
 
     console.log('✅ MongoDB Connected to Atlas');
 
@@ -50,13 +43,15 @@ async function connectDB() {
       .collection('test')
       .insertOne({ test: true });
     console.log('📝 Test document inserted:', testDoc.insertedId);
+
   } catch (err) {
     console.error('❌ MongoDB Connection Failed:', err);
-    process.exit(1);
+    process.exit(1); // Exit if DB fails
   }
 }
 
 connectDB();
+
 
 // 2. Add the connection event handlers RIGHT AFTER the connection
 mongoose.connection.on('connected', () => {
