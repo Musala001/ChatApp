@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
@@ -16,7 +17,7 @@ const User = require('./Models/user');
 const Message = require('./Models/Message');
 
 
-require('dotenv').config();
+
 const cloudinary = require('cloudinary').v2;
 
 cloudinary.config({
