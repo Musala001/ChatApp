@@ -28,7 +28,7 @@ cloudinary.config({
 const app = express();
 
 //MongoDB connection:
-const mongoose = require('mongoose');
+
 
 async function connectDB() {
   try {
