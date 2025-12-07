@@ -28,25 +28,17 @@ cloudinary.config({
 const app = express();
 
 //MongoDB connection:
-// MongoDB connection:
-// MongoDB connection:
+const mongoose = require('mongoose');
+
 async function connectDB() {
   try {
     await mongoose.connect(process.env.MONGO_URI, {
       serverSelectionTimeoutMS: 5000
     });
-
-    console.log('✅ MongoDB Connected to Atlas');
-
-    // Optional: Insert test document
-    const testDoc = await mongoose.connection.db
-      .collection('test')
-      .insertOne({ test: true });
-    console.log('📝 Test document inserted:', testDoc.insertedId);
-
+    console.log('✅ MongoDB Connected');
   } catch (err) {
     console.error('❌ MongoDB Connection Failed:', err);
-    process.exit(1); // Exit if DB fails
+    process.exit(1);
   }
 }
 
