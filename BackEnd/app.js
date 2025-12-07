@@ -28,16 +28,19 @@ cloudinary.config({
 const app = express();
 
 //MongoDB connection:
+// MongoDB connection:
 async function connectDB() {
   try {
-await mongoose.connect(
-  'mongodb+srv://Musala001:12345@cluster0.otlfit6.mongodb.net/chatapp?retryWrites=true&w=majority&appName=Cluster0',
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 5000
+    await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 5000
+    });
+
+    console.log('✅ MongoDB Connected to Atlas');
+  } catch (err) {
+    console.error('❌ MongoDB Connection Failed:', err);
+    process.exit(1); // Exit if DB fails
   }
-);
+}
 
 
     console.log('✅ MongoDB Connected to Atlas');
