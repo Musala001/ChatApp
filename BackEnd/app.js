@@ -31,7 +31,7 @@ const app = express();
 async function connectDB() {
   try {
 await mongoose.connect(
-  'mongodb+srv://Musala001:12345@cluster0.otlfit6.mongodb.net/chatapp?retryWrites=true&w=majority&appName=Cluster0',
+  'mongodb+srv://Musala001:Musala001@cluster0.otlfit6.mongodb.net/chatapp?retryWrites=true&w=majority&appName=Cluster0',
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
