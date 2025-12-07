@@ -30,7 +30,8 @@ const app = express();
 //MongoDB connection:
 async function connectDB() {
   try {
-    await mongoose.connect('mongodb+srv://Musala001:%2A12345%23@cluster0.otlfit6.mongodb.net/chatapp?retryWrites=true&w=majority', {
+    await mongoose.connect('mongodb+srv://Musala001:12345@cluster0.otlfit6.mongodb.net/chatapp?retryWrites=true&w=majority&appName=Cluster0
+', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       serverSelectionTimeoutMS: 5000
